@@ -1,4 +1,2 @@
-cirplan.github.io
-=================
+A personal blog based on Jekyll-Bootstrap
 
-blog
