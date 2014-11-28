@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
  
  <title>点白</title>
- <link href="/atom.xml" rel="self"/>
- <link href=""/>
- <updated>2014-11-21T14:03:34+07:00</updated>
- <id></id>
+ <link href="jeffdeng.me/atom.xml" rel="self"/>
+ <link href="jeffdeng.me"/>
+ <updated>2014-11-28T18:14:00+07:00</updated>
+ <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
    <email>dcirplan@gmail.com</email>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Jekyll Introduction</title>
-   <link href="/2011/12/29/jekyll-introduction.html"/>
+   <link href="jeffdeng.me/2011/12/29/jekyll-introduction.html"/>
    <updated>2011-12-29T00:00:00+07:00</updated>
-   <id>/2011/12/29/jekyll-introduction</id>
+   <id>jeffdeng.me/2011/12/29/jekyll-introduction</id>
    <content type="html">
 &lt;p&gt;This Jekyll introduction will outline specifically  what Jekyll is and why you would want to use it.
 Directly following the intro we’ll learn exactly &lt;em&gt;how&lt;/em&gt; Jekyll does what it does.&lt;/p&gt;

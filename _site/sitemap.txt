@@ -1,12 +1,12 @@
 
-/404.html
-/about.html
-/archive.html
-/atom.xml
-/categories.html
-/index.html
-/pages.html
-/sitemap.txt
-/tags.html
+jeffdeng.me/404.html
+jeffdeng.me/about.html
+jeffdeng.me/archive.html
+jeffdeng.me/atom.xml
+jeffdeng.me/categories.html
+jeffdeng.me/index.html
+jeffdeng.me/pages.html
+jeffdeng.me/sitemap.txt
+jeffdeng.me/tags.html
 
-/2011/12/29/jekyll-introduction.html
+jeffdeng.me/2011/12/29/jekyll-introduction.html
