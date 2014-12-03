@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     
-    <title>点白</title>
+    <title>express的诡异错误 | 点白</title>
     
     
     <meta name="author" content="dcirplan">
@@ -159,40 +159,10 @@
 
       <div class="content">
         
-
-
 <div class="row post">
-  <div class="span11">
-    <h1 class="title">
-      <a href="/2014/12/03/express-fail.html" title="express的诡异错误">express的诡异错误</a> 
-      
-    </h1>
-    <div class="date f-c-b">Date：<span>03 December 2014</span></div>
+  <!-- <div class="span9">
+    <h1 class="title">express的诡异错误</h1>
     
-    <div class="tag">Tag
-      <ul class="tag_box">
-      
-      
-
-
-  
-     
-    	<li><a href="/tags.html#nodejs-ref">nodejs <span>1</span></a></li>
-     
-    	<li><a href="/tags.html#express-ref">express <span>1</span></a></li>
-     
-    	<li><a href="/tags.html#ejs-ref">ejs <span>1</span></a></li>
-     
-    	<li><a href="/tags.html#compass-ref">compass <span>1</span></a></li>
-    
-  
-
-
-
-      </ul>
-     
-      </div>
-      
 <p>最近用 <code>express</code> 新建项目，发现一个很诡异的问题，出现的简直毫无理由。我的exprss 版本是<code>4.9.0</code></p>
 
 <p>先看 <code>express</code> 的参数使用。</p>
@@ -281,14 +251,180 @@ $ gem install compass
 <p>好吧，其实是小问题，只是没想通。囧~</p>
 
 
-      <ul class="pager">
-        <li class="next"><a href="/archive.html" title="所有文章">查看所有文章 &rarr;</a></li>
+    <ul class="pager">
+    
+      <li class="previous"><a href="/2011/12/29/jekyll-introduction.html" title="Jekyll Introduction">&larr; Jekyll Introduction</a></li>
+    
+    
+    </ul>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'cirplanblog'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+
+
+
+
+  </div> -->
+
+  <div class="span11">
+    <h1 class="title">express的诡异错误</h1>
+    <div class="date f-c-b">Date：<span>03 December 2014</span></div>
+    
+    <div class="tag">Tag
+      <ul class="tag_box">
+      
+      
+
+
+  
+     
+    	<li><a href="/tags.html#nodejs-ref">nodejs <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#express-ref">express <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#ejs-ref">ejs <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#compass-ref">compass <span>1</span></a></li>
+    
+  
+
+
+
       </ul>
      
-  </div>
+      </div>
+    
+<p>最近用 <code>express</code> 新建项目，发现一个很诡异的问题，出现的简直毫无理由。我的exprss 版本是<code>4.9.0</code></p>
 
- <!--  <div class="span4 sidebar">
-    <h4 class="date">发布日期：<span>03 December 2014</span></h4> 
+<p>先看 <code>express</code> 的参数使用。</p>
+
+<pre><code>express -h
+
+Usage: express [options] [dir]
+
+Options:
+
+-h, --help          output usage information
+-V, --version       output the version number
+-e, --ejs           add ejs engine support (defaults to jade)
+    --hbs           add handlebars engine support
+-H, --hogan         add hogan.js engine support
+-c, --css &lt;engine&gt;  add stylesheet &lt;engine&gt; support (less|stylus|compass) (defaults to plain css)
+-f, --force         force on non-empty directory
+</code></pre>
+
+<p>新建项目，用 <code>ejs</code> 和 <code>sass</code> 。</p>
+
+<pre><code>express -e -c compass test
+
+create : test
+create : test/package.json
+create : test/app.js
+create : test/public
+create : test/public/javascripts
+create : test/public/images
+create : test/public/stylesheets
+create : test/public/stylesheets/style.scss
+create : test/routes
+create : test/routes/index.js
+create : test/routes/users.js
+create : test/views
+create : test/views/index.ejs
+create : test/views/error.ejs
+create : test/bin
+create : test/bin/www
+
+install dependencies:
+  $ cd test &amp;&amp; npm install
+
+run the app:
+  $ DEBUG=test ./bin/www
+</code></pre>
+
+<p><code>npm install</code> 后，执行 <code>DEBUG=test ./bin/www</code> ,现在还是ok的</p>
+
+<pre><code> test Express server listening on port 3000 +0ms
+</code></pre>
+
+<p>然后用浏览器打开 <code>http://localhost:3000/</code>, 问题来了：</p>
+
+<p>首先是浏览器报错：</p>
+
+<p><img src="/images/QQ20141203-1.png" alt="chrome-err" /></p>
+
+<p>错误信息是：<code>(failed) net::ERR_CONNECTION_REFUSED</code> ，其实应该报404错误，因为没有这个样式文件。然后这个时候，控制台也会报错：</p>
+
+<pre><code>  test Express server listening on port 3000 +0ms
+GET / 200 77.090 ms - 207
+
+events.js:72
+        throw er; // Unhandled 'error' event
+              ^
+Error: spawn ENOENT
+    at errnoException (child_process.js:1001:11)
+    at Process.ChildProcess._handle.onexit (child_process.js:792:34)
+</code></pre>
+
+<p>关键是我只是初始化了项目，代码完全没有改过。</p>
+
+<p>其实问题出在 <code>node-compass</code> 模块,可以查看github上的用法说明 <a href="https://github.com/nathggns/node-compass">node-compass</a>。</p>
+
+<blockquote>
+  <p>node-compass requires the compass ruby gem in order to compile compass.</p>
+</blockquote>
+
+<p>首先你的项目要安装ruby， 然后安装 compass。</p>
+
+<pre><code>$ gem update --system
+$ gem install compass
+</code></pre>
+
+<p>好吧，其实是小问题，只是没想通。囧~</p>
+
+
+    <ul class="pager">
+    
+      <li class="previous"><a href="/2011/12/29/jekyll-introduction.html" title="Jekyll Introduction">&larr; Jekyll Introduction</a></li>
+    
+    
+    </ul>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'cirplanblog'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+
+
+
+
+  </div>
+  
+  <!-- <div class="span4 sidebar">
+    <h4 class="date">发布日期：<span>03 December 2014</span></h4>
 
   
     <h4>标签</h4>
@@ -313,7 +449,7 @@ $ gem install compass
 
     </ul>
     
-  </div>--> 
+  </div> -->
 </div>
 
 

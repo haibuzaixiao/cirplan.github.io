@@ -133,7 +133,7 @@ html, body {
 }
 
 .post p, .about p {
-  text-indent: 2em;
+  /*text-indent: 2em;*/
   font-size:14px;
   line-height: 1.8;
 }

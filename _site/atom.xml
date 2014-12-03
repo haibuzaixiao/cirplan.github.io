@@ -4,7 +4,7 @@
  <title>点白</title>
  <link href="jeffdeng.me/atom.xml" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2014-11-28T18:43:18+07:00</updated>
+ <updated>2014-12-03T14:57:31+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
@@ -13,9 +13,105 @@
 
  
  <entry>
+   <title>express的诡异错误</title>
+   <link href="jeffdeng.me/2014/12/03/express-fail.html"/>
+   <updated>2014-12-03T00:00:00+08:00</updated>
+   <id>jeffdeng.me/2014/12/03/express-fail</id>
+   <content type="html">
+&lt;p&gt;最近用 &lt;code&gt;express&lt;/code&gt; 新建项目，发现一个很诡异的问题，出现的简直毫无理由。我的exprss 版本是&lt;code&gt;4.9.0&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;先看 &lt;code&gt;express&lt;/code&gt; 的参数使用。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;express -h
+
+Usage: express [options] [dir]
+
+Options:
+
+-h, --help          output usage information
+-V, --version       output the version number
+-e, --ejs           add ejs engine support (defaults to jade)
+    --hbs           add handlebars engine support
+-H, --hogan         add hogan.js engine support
+-c, --css &amp;lt;engine&amp;gt;  add stylesheet &amp;lt;engine&amp;gt; support (less|stylus|compass) (defaults to plain css)
+-f, --force         force on non-empty directory
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;新建项目，用 &lt;code&gt;ejs&lt;/code&gt; 和 &lt;code&gt;sass&lt;/code&gt; 。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;express -e -c compass test
+
+create : test
+create : test/package.json
+create : test/app.js
+create : test/public
+create : test/public/javascripts
+create : test/public/images
+create : test/public/stylesheets
+create : test/public/stylesheets/style.scss
+create : test/routes
+create : test/routes/index.js
+create : test/routes/users.js
+create : test/views
+create : test/views/index.ejs
+create : test/views/error.ejs
+create : test/bin
+create : test/bin/www
+
+install dependencies:
+  $ cd test &amp;amp;&amp;amp; npm install
+
+run the app:
+  $ DEBUG=test ./bin/www
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;npm install&lt;/code&gt; 后，执行 &lt;code&gt;DEBUG=test ./bin/www&lt;/code&gt; ,现在还是ok的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; test Express server listening on port 3000 +0ms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后用浏览器打开 &lt;code&gt;http://localhost:3000/&lt;/code&gt;, 问题来了：&lt;/p&gt;
+
+&lt;p&gt;首先是浏览器报错：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/QQ20141203-1.png&quot; alt=&quot;chrome-err&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;错误信息是：&lt;code&gt;(failed) net::ERR_CONNECTION_REFUSED&lt;/code&gt; ，其实应该报404错误，因为没有这个样式文件。然后这个时候，控制台也会报错：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  test Express server listening on port 3000 +0ms
+GET / 200 77.090 ms - 207
+
+events.js:72
+        throw er; // Unhandled &#39;error&#39; event
+              ^
+Error: spawn ENOENT
+    at errnoException (child_process.js:1001:11)
+    at Process.ChildProcess._handle.onexit (child_process.js:792:34)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;关键是我只是初始化了项目，代码完全没有改过。&lt;/p&gt;
+
+&lt;p&gt;其实问题出在 &lt;code&gt;node-compass&lt;/code&gt; 模块,可以查看github上的用法说明 &lt;a href=&quot;https://github.com/nathggns/node-compass&quot;&gt;node-compass&lt;/a&gt;。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;node-compass requires the compass ruby gem in order to compile compass.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;首先你的项目要安装ruby， 然后安装 compass。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ gem update --system
+$ gem install compass
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;好吧，其实是小问题，只是没想通。囧~&lt;/p&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
    <title>Jekyll Introduction</title>
    <link href="jeffdeng.me/2011/12/29/jekyll-introduction.html"/>
-   <updated>2011-12-29T00:00:00+07:00</updated>
+   <updated>2011-12-29T00:00:00+08:00</updated>
    <id>jeffdeng.me/2011/12/29/jekyll-introduction</id>
    <content type="html">
 &lt;p&gt;This Jekyll introduction will outline specifically  what Jekyll is and why you would want to use it.
