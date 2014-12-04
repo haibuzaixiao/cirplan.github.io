@@ -4,13 +4,126 @@
  <title>点白</title>
  <link href="jeffdeng.me/atom.xml" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2014-12-03T14:57:31+08:00</updated>
+ <updated>2014-12-04T14:02:08+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
    <email>dcirplan@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>前端编码规范（1）-- html</title>
+   <link href="jeffdeng.me/2014/12/04/code-standers-1.html"/>
+   <updated>2014-12-04T00:00:00+08:00</updated>
+   <id>jeffdeng.me/2014/12/04/code-standers-1</id>
+   <content type="html">
+&lt;p&gt;搞前端也挺久了，但代码一直没有规范的写，都是随心所欲，爱咋咋地。最近QL师兄丢了网站过来，真心给力，前端的都可以去看看。&lt;a href=&quot;http://coderlmn.github.io/code-standards/&quot;&gt;isobar编码规范&lt;/a&gt;。下面把一些我认为比较重要的copy出来。&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;&lt;strong&gt;前端开发核心思想&lt;/strong&gt;&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;表现、内容和行为的分离。&lt;/li&gt;
+  &lt;li&gt;标记应该是结构良好、语义正确 以及 普遍合法 。&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;Javascript&lt;/code&gt;应该起到渐进式增强用户体验的作用 。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;&lt;strong&gt;总体原则&lt;/strong&gt;&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;&lt;strong&gt;缩进&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;对于所有编程语言，要求缩进必须是软&lt;code&gt;tab&lt;/code&gt;（用空格字符）。在文本编辑器里敲 &lt;code&gt;Tab&lt;/code&gt; 应该等于 4个空格 。&lt;/p&gt;
+
+&lt;h3 id=&quot;vs-&quot;&gt;&lt;strong&gt;可读性 vs 压缩&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;对于维护现有文件，认为可读性比节省文件大小更重要。大量空白和适当的&lt;code&gt;ASCII&lt;/code&gt;艺术都是受鼓励的。任何开发者都不必故意去压缩&lt;code&gt;HTML&lt;/code&gt;或&lt;code&gt;CSS&lt;/code&gt;，也不必把&lt;code&gt;Javascript&lt;/code&gt;代码最小化得面目全非。&lt;/p&gt;
+
+&lt;p&gt;会在服务器端或&lt;code&gt;build&lt;/code&gt;过程中自动最小化并&lt;code&gt;gzip&lt;/code&gt;压缩所有的静态客户端文件，例如&lt;code&gt;CSS&lt;/code&gt;和&lt;code&gt;JS&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h2 id=&quot;html&quot;&gt;&lt;strong&gt;HTML&lt;/strong&gt;&lt;/h2&gt;
+
+&lt;h3 id=&quot;doctype&quot;&gt;&lt;strong&gt;Doctype&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;使用合适的&lt;code&gt;Doctype&lt;/code&gt;来指示浏览器触发标准模式. 永远要避免&lt;code&gt;Quirks&lt;/code&gt;模式。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;&lt;strong&gt;字符编码&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;meta charset=&quot;utf-8&quot;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-4&quot;&gt;&lt;strong&gt;属性加引号&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;在&lt;code&gt;HTML5&lt;/code&gt;规范里并没有严格要求属性值两边加引号。但考虑到一些属性可以接受空白值，为了保持一致性，所有属性值必须加上引号。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-5&quot;&gt;&lt;strong&gt;标签的总体原则&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;在创建的&lt;code&gt;HTML&lt;/code&gt;文档里总是要使用能够代表内容语义的标签。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;段落分隔符要使用实际对应的&lt;code&gt;&amp;lt;p&amp;gt;&lt;/code&gt;元素，而不是用多个&lt;code&gt;&amp;lt;br&amp;gt;&lt;/code&gt;标签。&lt;/li&gt;
+  &lt;li&gt;在合适的条件下，充分利用&lt;code&gt;&amp;lt;dl&amp;gt;&lt;/code&gt; （定义列表）和&lt;code&gt;&amp;lt;blockquote&amp;gt;&lt;/code&gt; 标签。&lt;/li&gt;
+  &lt;li&gt;列表中的条目必须总是放置于&lt;code&gt;&amp;lt;ul&amp;gt;&lt;/code&gt;、&lt;code&gt;&amp;lt;ol&amp;gt;&lt;/code&gt;或&lt;code&gt;&amp;lt;dl&amp;gt;&lt;/code&gt; 中，永远不要用一组 &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt;或&lt;code&gt;&amp;lt;p&amp;gt;&lt;/code&gt; 来表示。&lt;/li&gt;
+  &lt;li&gt;给每个表单里的字段加上 &lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt; 标签，其中的 &lt;code&gt;for&lt;/code&gt;属性必须和对应的输入字段对应，这样用户就可以点击标签。同理，给标签加上 &lt;code&gt;cursor:pointer&lt;/code&gt;; 样式也是明智的做法。&lt;/li&gt;
+  &lt;li&gt;在某些闭合的 &lt;code&gt;&amp;lt;/div&amp;gt;&lt;/code&gt;标签旁边加上一段&lt;code&gt;html&lt;/code&gt;注释，说明这里闭合的是什么元素。这在有大量嵌套和缩进的情况下会很有用。&lt;/li&gt;
+  &lt;li&gt;不要把表格用于页面布局。&lt;/li&gt;
+  &lt;li&gt;在合适的条件下，利用 &lt;code&gt;&amp;lt;thead&amp;gt;&lt;/code&gt;、&lt;code&gt;&amp;lt;tbody&amp;gt;&lt;/code&gt;和&lt;code&gt;&amp;lt;th&amp;gt;&lt;/code&gt;标签.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面贴上&lt;a href=&quot;http://html5boilerplate.com&quot;&gt;html5-boilerplate&lt;/a&gt;的标准首页。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;!--[if lt IE 7]&amp;gt;      &amp;lt;html class=&quot;no-js lt-ie9 lt-ie8 lt-ie7&quot;&amp;gt; &amp;lt;![endif]--&amp;gt;
+&amp;lt;!--[if IE 7]&amp;gt;         &amp;lt;html class=&quot;no-js lt-ie9 lt-ie8&quot;&amp;gt; &amp;lt;![endif]--&amp;gt;
+&amp;lt;!--[if IE 8]&amp;gt;         &amp;lt;html class=&quot;no-js lt-ie9&quot;&amp;gt; &amp;lt;![endif]--&amp;gt;
+&amp;lt;!--[if gt IE 8]&amp;gt;&amp;lt;!--&amp;gt; &amp;lt;html class=&quot;no-js&quot;&amp;gt; &amp;lt;!--&amp;lt;![endif]--&amp;gt;
+    &amp;lt;head&amp;gt;
+        &amp;lt;meta charset=&quot;utf-8&quot;&amp;gt;
+        &amp;lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&amp;gt;
+        &amp;lt;title&amp;gt;&amp;lt;/title&amp;gt;
+        &amp;lt;meta name=&quot;description&quot; content=&quot;&quot;&amp;gt;
+        &amp;lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&amp;gt;
+
+        &amp;lt;!-- Place favicon.ico and apple-touch-icon.png in the root directory --&amp;gt;
+
+        &amp;lt;link rel=&quot;stylesheet&quot; href=&quot;css/normalize.css&quot;&amp;gt;
+        &amp;lt;link rel=&quot;stylesheet&quot; href=&quot;css/main.css&quot;&amp;gt;
+        &amp;lt;script src=&quot;js/vendor/modernizr-2.6.2.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+    &amp;lt;/head&amp;gt;
+    &amp;lt;body&amp;gt;
+        &amp;lt;!--[if lt IE 7]&amp;gt;
+            &amp;lt;p class=&quot;browsehappy&quot;&amp;gt;You are using an &amp;lt;strong&amp;gt;outdated&amp;lt;/strong&amp;gt; browser. Please &amp;lt;a href=&quot;http://browsehappy.com/&quot;&amp;gt;upgrade your browser&amp;lt;/a&amp;gt; to improve your experience.&amp;lt;/p&amp;gt;
+        &amp;lt;![endif]--&amp;gt;
+
+        &amp;lt;!-- Add your site or application content here --&amp;gt;
+        &amp;lt;p&amp;gt;Hello world! This is HTML5 Boilerplate.&amp;lt;/p&amp;gt;
+
+        &amp;lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;script&amp;gt;window.jQuery || document.write(&#39;&amp;lt;script src=&quot;js/vendor/jquery-1.10.2.min.js&quot;&amp;gt;&amp;lt;\/script&amp;gt;&#39;)&amp;lt;/script&amp;gt;
+        &amp;lt;script src=&quot;js/plugins.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+        &amp;lt;script src=&quot;js/main.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+
+        &amp;lt;!-- Google Analytics: change UA-XXXXX-X to be your site&#39;s ID. --&amp;gt;
+        &amp;lt;script&amp;gt;
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src=&#39;//www.google-analytics.com/analytics.js&#39;;
+            r.parentNode.insertBefore(e,r)}(window,document,&#39;script&#39;,&#39;ga&#39;));
+            ga(&#39;create&#39;,&#39;UA-XXXXX-X&#39;);ga(&#39;send&#39;,&#39;pageview&#39;);
+        &amp;lt;/script&amp;gt;
+    &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样就可以根据自己的需要去更改了。当然，前提你得先有一份boilerplate的源码。&lt;/p&gt;
+
+&lt;p&gt;总是使用能够代表内容语义的标签是比较重要的，从以前的&lt;code&gt;table&lt;/code&gt;布局到现在&lt;code&gt;div&lt;/code&gt;+&lt;code&gt;css&lt;/code&gt;布局，这是始终如一的，不能盲目的堆叠&lt;code&gt;div&lt;/code&gt;之类的标签。&lt;/p&gt;
+
+</content>
+ </entry>
  
  <entry>
    <title>express的诡异错误</title>
