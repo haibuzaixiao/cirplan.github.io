@@ -9,6 +9,8 @@ jeffdeng.me/pages.html
 jeffdeng.me/sitemap.txt
 jeffdeng.me/tags.html
 
+jeffdeng.me/2014/12/08/css-selector.html
+jeffdeng.me/2014/12/05/css-specificity-wars.html
 jeffdeng.me/2014/12/04/code-standers-1.html
 jeffdeng.me/2014/12/03/express-fail.html
 jeffdeng.me/2011/12/29/jekyll-introduction.html

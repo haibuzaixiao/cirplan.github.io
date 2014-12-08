@@ -1,8 +1,8 @@
 ---
 layout: post
 category : css
-title: 层叠和选择器的明确度--权重
-tags : [css,web]
+title: 译.层叠和选择器的明确度--权重
+tags : [css,web,翻译]
 ---
 {% include JB/setup %}
 
@@ -34,6 +34,7 @@ tags : [css,web]
 * `id`选择器权重 1，0，0
 * 然后把对应选择器的数字按对应的位置加起来就是权重
 
+感觉3种方法都差不多，只要能正确判断，哪一种都可以。
 
 [1]: http://www.stuffandnonsense.co.uk/archives/css_specificity_wars.html
 
