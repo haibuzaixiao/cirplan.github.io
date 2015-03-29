@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     
-    <title>萝白</title>
+    <title>萝拔</title>
     
     
     <meta name="author" content="dcirplan">
@@ -35,7 +35,7 @@
     <div class="navbar">
       <div class="navbar-inner">
         <div class="container">
-          <a class="brand" href="/">萝白</a>
+          <a class="brand" href="/">萝拔</a>
           <ul class="nav">
             
             
@@ -164,10 +164,10 @@
 <div class="row post">
   <div class="span11">
     <h1 class="title">
-      <a href="/2014/12/08/css-selector.html" title="译.css选择器渲染优化">译.css选择器渲染优化</a> 
+      <a href="/2015/01/21/sql-1.html" title="sql学习笔记1">sql学习笔记1</a> 
       
     </h1>
-    <div class="date f-c-b">Date：<span>08 December 2014</span></div>
+    <div class="date f-c-b">Date：<span>21 January 2015</span></div>
     
     <div class="tag-n">Tag
       <ul class="tag_box">
@@ -177,9 +177,7 @@
 
   
      
-    	<li><a href="/tags.html#css-ref">css <span>3</span></a></li>
-     
-    	<li><a href="/tags.html#翻译-ref">翻译 <span>2</span></a></li>
+    	<li><a href="/tags.html#sql-ref">sql <span>1</span></a></li>
     
   
 
@@ -189,81 +187,144 @@
      
       </div>
       
-<p>原文：<a href="http://calendar.perfplanet.com/2011/css-selector-performance-has-changed-for-the-better/">css selector performance has changed</a>。这里来看看这篇文章的主要内容。</p>
+<p>由于没有认真学过SQL，现在开始看，顺便记录下。</p>
 
-<p>下面是我们之前就知道的：</p>
+<h3 id="section">概述</h3>
+
+<p>SQL可以分成两个部分：</p>
 
 <ul>
-  <li>选择器匹配元素是从右到左，应该避免比较艰难匹配的选择器。</li>
-  <li>后代选择器是比较缓慢的，尤其是最右的选择器匹配到大量元素的时候。</li>
+  <li>数据操作（DML, data manipulation language）</li>
+  <li>数据定义（DDL, data definition language）</li>
 </ul>
 
-<p>改变的现状：</p>
+<p>DML指令有：</p>
 
-<p>Antti Koivisto，是<code>WebKit</code>代码的贡献者，最近花了一些时间去优化<code>css</code>的选择器匹配。在完成这项工作后，他说：</p>
+<ul>
+  <li>SELETE</li>
+  <li>UPDATE</li>
+  <li>DELETE</li>
+  <li>INSERT INTO</li>
+</ul>
 
-<blockquote>
-  <p>我的观点是：写代码的人不应该去担心选择器的优化，这应该是浏览器引擎的工作。</p>
-</blockquote>
+<p>DDL指令有：</p>
 
-<p>下面我们来看看他在四个方面做的特别优化：</p>
+<ul>
+  <li>CREATE DATABASE</li>
+  <li>ALTER DATABASE</li>
+  <li>CREATE TABLE</li>
+  <li>ALTER TABLE</li>
+  <li>DROP TABLE</li>
+  <li>CREATE INDEX</li>
+  <li>DROP INDEX</li>
+</ul>
 
-<ol>
-  <li>Style Sharing（共享样式）</li>
-  <li>Rule Hashes（哈希规则）</li>
-  <li>Ancestor Filters（父代过滤器）</li>
-  <li>Fast Path（快速路径）</li>
-</ol>
+<p>TIP: </p>
 
-<h3 id="section"><strong>共享样式</strong></h3>
-<p>共享样式允许浏览器根据已经匹配到得元素，快速找出其他相同样式的元素。</p>
+<ul>
+  <li>语句以分号结尾。</li>
+  <li>文本值用单引号，数字不加。</li>
+</ul>
 
-<p>ex: </p>
+<h2 id="section-1">基本命令</h2>
 
-<pre><code>&lt;div&gt;
-  &lt;p&gt;foo&lt;/p&gt;
-  &lt;p&gt;bar&lt;/p&gt;
-&lt;/div&gt;
+<h3 id="selete">SELETE</h3>
+<p>从table中选择数据，返回结果集。</p>
+
+<pre><code>SELETE * FROM TABEL1
+SELETE Column Name1, Column Name2 FROM TABLE1
 </code></pre>
 
-<p>如果浏览器引擎已经计算出第一个<code>&lt;p&gt;</code>的样式（已经渲染），它就不用再去计算第二个<code>&lt;p&gt;</code>的样式，直接渲染就是了（当然这个前提是第一个<code>&lt;p&gt;</code>和第二个<code>&lt;p&gt;</code>的样式选择器一致，如<code>div p{}
-</code>之类）。这是很简单的一小步，却优化
-选择器的一大步。</p>
+<h3 id="selete-distinct">SELETE DISTINCT</h3>
+<p>返回不重复的值</p>
 
-<h3 id="section-1"><strong>哈希规则</strong></h3>
-<p>我们现在都知道匹配选择器是从右到左，所以最右边的选择器是很重要的。哈希规则基于最右的选择器来把选择器分组。举个例子，下面的选择器会分成三组。</p>
-
-<pre><code>a {}
-div p {}
-div p.legal {}
-#sidebar a {}
-#sidebar p {}
-
-1: a, a {}, #sidebar a
-
-2: p, div p {}, #sidebar p {}
-
-3: p.legal , div p.legal {}
+<pre><code>SELETE DISTINCT Column Name FROME TABEL
 </code></pre>
 
-<p>当浏览器使用哈希规则的时候，它不一定要去查找样式表中所个有的单的选择器，而是分组去匹配。
-这对于页面上单个的<code>HTML</code>元素，同样很巧妙的节省了很多工作。</p>
+<h3 id="where">WHERE</h3>
+<p>有条件的选择</p>
 
-<h3 id="section-2"><strong>父代过滤器</strong></h3>
-<p>父代过滤器是有点复杂的。它们通过计算一个选择器可以匹配的可能性，去过滤，所以也称为可能性过滤器。所以，父代过滤器可以快速排除那些没有匹配的元素。它通过<code>class</code>,<code>id</code>,<code>tag</code>去匹配后代和子选择器。后代选择器是认为匹配比较慢的，因为渲染引擎要循环所有的父节点，尝试选择器是否匹配。这个时候<code>bloom</code>过滤器就闪亮登场了。</p>
+<pre><code>SELETE COL NAME FORM TABEL1 WHERE 列 运算符 值
+</code></pre>
 
-<p><code>bloom</code>过滤器是一个数据集合，可以让你判断某个选择器是否在集合中.bloom过滤器判断一个
-css规则是否是在当前的元素集合中（The bloom filter tests whether a CSS rule is a member of the set of rules which match the element you are currently testing）。这其中很特别的一件事是，误报是有可能的，但漏报是不可能的。这意味着，如果bloom过滤器判断出一个选择器不符合当前的元素，浏览器就会停止查看当前的选择器，跳到下一个选择器。这里又节省了很多时间。如果<code>bloom</code>过滤器判断出当前的元素匹配，浏览器会继续通过常规的方法去进行100%的准确匹配。样式表文件越大，误报的几率就越大。所以要保持样式表文件的比较近小。</p>
+<p>运算符有</p>
 
-<h3 id="section-3"><strong>快速路径</strong></h3>
-<p>快速路径通过内在的循环，而不是递归，去取代常规的匹配逻辑（Fast path re-implements more general matching logic using a non-recursive, fully inlined loop. ）。 它通常用在匹配下面组合的选择器：</p>
+<ul>
+  <li>= 等于</li>
+  <li>&lt;&gt; 不等于</li>
+  <li><span>&gt;</span> 大于</li>
+  <li>&lt; 小于</li>
+  <li><span>&gt;=</span> 大于等于</li>
+  <li><span>&lt;=</span> 小于等于</li>
+  <li>BETWEEN 在某个范围内</li>
+  <li>
+    <p>LINK 搜索某种模式</p>
 
-<ol>
-  <li>后代，子代，子代选择器组合</li>
-  <li><code>tag</code>，<code>id</code>，<code>class</code>和属性组合选择器</li>
-</ol>
+    <pre><code>  SELETE NAME1 FORM TABEL1 WHERE NAME2='12';
+</code></pre>
+  </li>
+</ul>
 
-<p>以上就是Antti对<code>WebKit</code>引擎的四个优化。(有点高深，不是很懂~囧)</p>
+<h3 id="and-or">AND OR</h3>
+<p>多个条件。可以用圆括号多重组合。</p>
+
+<pre><code>SELETE * FROM TABEL1 WHERE (NAME='123' AND CITY='SZ') OR ID=12;
+</code></pre>
+
+<h3 id="order-by">ORDER BY</h3>
+<p>对指定的列排序。ORDER BY 默认是升序。DESC 降序，ASC 升序。</p>
+
+<pre><code>SELECT Company, OrderNumber FROM Orders ORDER BY Company;
+SELECT Company, OrderNumber FROM Orders ORDER BY Company, OrderNumber;
+SELECT Company, OrderNumber FROM Orders ORDER BY Company DESC;
+SELECT Company, OrderNumber FROM Orders ORDER BY Company DESC, OrderNumber ASC;
+</code></pre>
+
+<h3 id="insert-into">INSERT INTO</h3>
+<p>向表中插入新的行。</p>
+
+<pre><code>INSERT INTO Persons VALUES ('Gates', 'Bill', 'Xuanwumen 10', 'Beijing');
+INSERT INTO Persons (LastName, Address) VALUES ('Wilson', 'Champs-Elysees');
+</code></pre>
+
+<h3 id="update">UPDATE</h3>
+<p>修改表中的数据。</p>
+
+<pre><code>UPDATE Person SET FirstName = 'Fred' WHERE LastName = 'Wilson';
+UPDATE Person SET Address = 'Zhongshan 23', City = 'Nanjing' WHERE LastName = 'Wilson';
+</code></pre>
+
+<h3 id="delete">DELETE</h3>
+<p>删除表中的行。</p>
+
+<pre><code>DELETE FROM Person WHERE LastName = 'Wilson';
+</code></pre>
+
+<p>下面是实践时间。</p>
+
+<pre><code>// 创建 User 表
+CREATE TABLE `User` (
+    `id`                int             NOT NULL AUTO_INCREMENT,
+    `uid`               varchar(250)    NULL COMMENT '有效时间的身份',
+    `sid`               varchar(250)    NULL COMMENT '有效时间',
+    `email`             varchar(250)    NULL COMMENT '邮箱',
+    `password`        	varchar(250)    NULL COMMENT '密码',
+    `timestamp`         datetime        NULL COMMENT '时间戳',
+     PRIMARY KEY (`id`)
+);
+
+//插入数据
+INSERT INTO USER (uid, sid, email, password, timestamp) values ('213213123', '909989', '123@qq.com', '123456', '2015-01-21'), ('123', '908', '123456@qq.com', '1234256', '2015-01-22');
+
+//查询
+select * from `User` where uid = '213213123';
+
+//修改数据
+update `User` set uid='103' where uid = '123';
+
+//删除数据
+delete from `User` where uid='103';
+</code></pre>
 
 
       <ul class="pager">
@@ -307,7 +368,7 @@ css规则是否是在当前的元素集合中（The bloom filter tests whether a
         var doms = document.querySelectorAll('pre');
 
         for( var i = 0; i < doms.length; i++ ){
-          doms[i].className += ' prettyprint linenums';
+          doms[i].className += ' prettyprint ';
         }
         prettyPrint();
       };
