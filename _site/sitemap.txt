@@ -1,25 +1,21 @@
 
-jeffdeng.me/404.html
-jeffdeng.me/about.html
 jeffdeng.me/archive.html
 jeffdeng.me/atom.xml
 jeffdeng.me/categories.html
 jeffdeng.me/index.html
 jeffdeng.me/pages.html
+jeffdeng.me/rss.xml
 jeffdeng.me/sitemap.txt
 jeffdeng.me/tags.html
 
-jeffdeng.me/2015/01/21/sql-1.html
-jeffdeng.me/2015/01/08/plan.html
-jeffdeng.me/2015/01/05/underscorejs-array.html
-jeffdeng.me/2015/01/04/year-review.html
-jeffdeng.me/2015/01/04/underscorejs-collections.html
-jeffdeng.me/2014/12/12/java-urlrewritefilter.html
-jeffdeng.me/2014/12/08/css-selector.html
-jeffdeng.me/2014/12/08/css-performance.html
-jeffdeng.me/2014/12/05/css-specificity-wars.html
-jeffdeng.me/2014/12/05/code-standers-2.html
-jeffdeng.me/2014/12/04/code-standers-1.html
-jeffdeng.me/2014/12/03/express-fail.html
-jeffdeng.me/2014/02/20/plan.html
-jeffdeng.me/2011/12/29/jekyll-introduction.html
+jeffdeng.me/plan/2015/01/08/plan
+jeffdeng.me/plan/2015/01/04/year-review
+jeffdeng.me/java/2014/12/12/java-urlrewritefilter
+jeffdeng.me/css/2014/12/08/css-selector
+jeffdeng.me/css/2014/12/08/css-performance
+jeffdeng.me/css/2014/12/05/css-specificity-wars
+jeffdeng.me/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/2014/12/05/code-standers-2
+jeffdeng.me/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/2014/12/04/code-standers-1
+jeffdeng.me/nodejs/2014/12/03/express-fail
+jeffdeng.me/plan/2014/02/20/plan
+jeffdeng.me/lessons/2011/12/29/jekyll-introduction

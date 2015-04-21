@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    {% if page.title == 'index' %}
-    <title>{{ site.title }}</title>
-    {% else %}
-    <title>{{ page.title }} | {{ site.title }}</title>
-    {% endif %}
+    <title>{{ page.title }}</title>
     {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
     <meta name="author" content="{{ site.author.name }}">
+
+    <!-- Enable responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
@@ -16,85 +15,52 @@
     <![endif]-->
 
     <!-- Le styles -->
-    {% if site.debug == true %}
-      <link href="{{ ASSET_PATH }}/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-      <link href="{{ ASSET_PATH }}/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
-    {% else %}
-      <link href="{{ ASSET_PATH }}/css/style.min.css?body=1" rel="stylesheet" type="text/css" media="all">
-    {% endif %}
-    
+    <link href="{{ ASSET_PATH }}/bootstrap/css/bootstrap.2.2.2.min.css" rel="stylesheet">
+    <link href="{{ ASSET_PATH }}/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+
     <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="/favicon.ico">
   <!-- Update these with your own images
+    <link rel="shortcut icon" href="images/favicon.ico">
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
     <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
   -->
-    <!-- <script type="text/javascript" src="{{ ASSET_PATH }}/js/jquery-2.1.1.min.js"></script> -->
-    <script type="text/javascript" src="{{ ASSET_PATH }}/js/prettify.js"></script>
+
+    <!-- atom & rss feed -->
+    <link href="{{ BASE_PATH }}{{ site.JB.atom_path }}" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+    <link href="{{ BASE_PATH }}{{ site.JB.rss_path }}" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
   </head>
 
   <body>
-
     <div class="navbar">
       <div class="navbar-inner">
-        <div class="container">
+        <div class="container-narrow">
           <a class="brand" href="{{ HOME_PATH }}">{{ site.title }}</a>
           <ul class="nav">
             {% assign pages_list = site.pages %}
             {% assign group = 'navigation' %}
             {% include JB/pages_list %}
-            <li class="divider-vertical"></li>
-            {% assign pages_list = site.pages %}
-            {% assign group = 'meta' %}
-            {% include JB/pages_list %}
-
-           <!--  <li><a href="http://feed.zhuoqun.net/">订阅</a></li> -->
           </ul>
-
-          <span class="pull-right slogan"> {{ site.tagline }} </span>
         </div>
       </div>
     </div>
 
-    <div class="container">
+    <div class="container-narrow">
 
       <div class="content">
         {{ content }}
       </div>
-
+      <hr>
       <footer>
-        <p>&copy; <a href="mailto:{{ site.author.email }}">{{ site.author.name }}</a> 2014. 
-          Proudly powered by <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+        <p>&copy; {{ site.time | date: '%Y' }} {{ site.author.name }}
+          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
           and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
         </p>
       </footer>
 
-    </div> <!-- /container -->
+    </div>
 
-    <!-- {% include JB/analytics %} -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-46595250-3', 'auto');
-      ga('send', 'pageview');
-
-    </script>
-
-    <script type="text/javascript">
-      window.onload = function() {
-        var doms = document.querySelectorAll('pre');
-
-        for( var i = 0; i < doms.length; i++ ){
-          doms[i].className += ' prettyprint ';
-        }
-        prettyPrint();
-      };
-     
-    </script>
-
+    {% include JB/analytics %}
   </body>
 </html>

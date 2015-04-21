@@ -2,9 +2,9 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
  
  <title>萝拔</title>
- <link href="jeffdeng.me/atom.xml" rel="self"/>
+ <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2015-02-28T12:13:38+08:00</updated>
+ <updated>2015-04-21T13:07:06+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
@@ -13,158 +13,10 @@
 
  
  <entry>
-   <title>sql学习笔记1</title>
-   <link href="jeffdeng.me/2015/01/21/sql-1.html"/>
-   <updated>2015-01-21T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2015/01/21/sql-1</id>
-   <content type="html">
-&lt;p&gt;由于没有认真学过SQL，现在开始看，顺便记录下。&lt;/p&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;概述&lt;/h3&gt;
-
-&lt;p&gt;SQL可以分成两个部分：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;数据操作（DML, data manipulation language）&lt;/li&gt;
-  &lt;li&gt;数据定义（DDL, data definition language）&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;DML指令有：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;SELETE&lt;/li&gt;
-  &lt;li&gt;UPDATE&lt;/li&gt;
-  &lt;li&gt;DELETE&lt;/li&gt;
-  &lt;li&gt;INSERT INTO&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;DDL指令有：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;CREATE DATABASE&lt;/li&gt;
-  &lt;li&gt;ALTER DATABASE&lt;/li&gt;
-  &lt;li&gt;CREATE TABLE&lt;/li&gt;
-  &lt;li&gt;ALTER TABLE&lt;/li&gt;
-  &lt;li&gt;DROP TABLE&lt;/li&gt;
-  &lt;li&gt;CREATE INDEX&lt;/li&gt;
-  &lt;li&gt;DROP INDEX&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;TIP: &lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;语句以分号结尾。&lt;/li&gt;
-  &lt;li&gt;文本值用单引号，数字不加。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;section-1&quot;&gt;基本命令&lt;/h2&gt;
-
-&lt;h3 id=&quot;selete&quot;&gt;SELETE&lt;/h3&gt;
-&lt;p&gt;从table中选择数据，返回结果集。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;SELETE * FROM TABEL1
-SELETE Column Name1, Column Name2 FROM TABLE1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;selete-distinct&quot;&gt;SELETE DISTINCT&lt;/h3&gt;
-&lt;p&gt;返回不重复的值&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;SELETE DISTINCT Column Name FROME TABEL
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;where&quot;&gt;WHERE&lt;/h3&gt;
-&lt;p&gt;有条件的选择&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;SELETE COL NAME FORM TABEL1 WHERE 列 运算符 值
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;运算符有&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;= 等于&lt;/li&gt;
-  &lt;li&gt;&amp;lt;&amp;gt; 不等于&lt;/li&gt;
-  &lt;li&gt;&lt;span&gt;&amp;gt;&lt;/span&gt; 大于&lt;/li&gt;
-  &lt;li&gt;&amp;lt; 小于&lt;/li&gt;
-  &lt;li&gt;&lt;span&gt;&amp;gt;=&lt;/span&gt; 大于等于&lt;/li&gt;
-  &lt;li&gt;&lt;span&gt;&amp;lt;=&lt;/span&gt; 小于等于&lt;/li&gt;
-  &lt;li&gt;BETWEEN 在某个范围内&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;LINK 搜索某种模式&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  SELETE NAME1 FORM TABEL1 WHERE NAME2=&#39;12&#39;;
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;and-or&quot;&gt;AND OR&lt;/h3&gt;
-&lt;p&gt;多个条件。可以用圆括号多重组合。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;SELETE * FROM TABEL1 WHERE (NAME=&#39;123&#39; AND CITY=&#39;SZ&#39;) OR ID=12;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;order-by&quot;&gt;ORDER BY&lt;/h3&gt;
-&lt;p&gt;对指定的列排序。ORDER BY 默认是升序。DESC 降序，ASC 升序。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;SELECT Company, OrderNumber FROM Orders ORDER BY Company;
-SELECT Company, OrderNumber FROM Orders ORDER BY Company, OrderNumber;
-SELECT Company, OrderNumber FROM Orders ORDER BY Company DESC;
-SELECT Company, OrderNumber FROM Orders ORDER BY Company DESC, OrderNumber ASC;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;insert-into&quot;&gt;INSERT INTO&lt;/h3&gt;
-&lt;p&gt;向表中插入新的行。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;INSERT INTO Persons VALUES (&#39;Gates&#39;, &#39;Bill&#39;, &#39;Xuanwumen 10&#39;, &#39;Beijing&#39;);
-INSERT INTO Persons (LastName, Address) VALUES (&#39;Wilson&#39;, &#39;Champs-Elysees&#39;);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;update&quot;&gt;UPDATE&lt;/h3&gt;
-&lt;p&gt;修改表中的数据。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;UPDATE Person SET FirstName = &#39;Fred&#39; WHERE LastName = &#39;Wilson&#39;;
-UPDATE Person SET Address = &#39;Zhongshan 23&#39;, City = &#39;Nanjing&#39; WHERE LastName = &#39;Wilson&#39;;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;delete&quot;&gt;DELETE&lt;/h3&gt;
-&lt;p&gt;删除表中的行。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;DELETE FROM Person WHERE LastName = &#39;Wilson&#39;;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;下面是实践时间。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// 创建 User 表
-CREATE TABLE `User` (
-    `id`                int             NOT NULL AUTO_INCREMENT,
-    `uid`               varchar(250)    NULL COMMENT &#39;有效时间的身份&#39;,
-    `sid`               varchar(250)    NULL COMMENT &#39;有效时间&#39;,
-    `email`             varchar(250)    NULL COMMENT &#39;邮箱&#39;,
-    `password`        	varchar(250)    NULL COMMENT &#39;密码&#39;,
-    `timestamp`         datetime        NULL COMMENT &#39;时间戳&#39;,
-     PRIMARY KEY (`id`)
-);
-
-//插入数据
-INSERT INTO USER (uid, sid, email, password, timestamp) values (&#39;213213123&#39;, &#39;909989&#39;, &#39;123@qq.com&#39;, &#39;123456&#39;, &#39;2015-01-21&#39;), (&#39;123&#39;, &#39;908&#39;, &#39;123456@qq.com&#39;, &#39;1234256&#39;, &#39;2015-01-22&#39;);
-
-//查询
-select * from `User` where uid = &#39;213213123&#39;;
-
-//修改数据
-update `User` set uid=&#39;103&#39; where uid = &#39;123&#39;;
-
-//删除数据
-delete from `User` where uid=&#39;103&#39;;
-&lt;/code&gt;&lt;/pre&gt;
-
-</content>
- </entry>
- 
- <entry>
    <title>2015展望</title>
-   <link href="jeffdeng.me/2015/01/08/plan.html"/>
+   <link href="jeffdeng.me/plan/2015/01/08/plan"/>
    <updated>2015-01-08T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2015/01/08/plan</id>
+   <id>jeffdeng.me/plan/2015/01/08/plan</id>
    <content type="html">
 &lt;p&gt;新的一年，总得写点什么，例如立下些雄心壮志的目标之类。虽然最后往往都是不了了之，但还是可以很装的说一句：立过。&lt;/p&gt;
 
@@ -197,304 +49,10 @@ delete from `User` where uid=&#39;103&#39;;
  </entry>
  
  <entry>
-   <title>underscore.js Api -- array</title>
-   <link href="jeffdeng.me/2015/01/05/underscorejs-array.html"/>
-   <updated>2015-01-05T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2015/01/05/underscorejs-array</id>
-   <content type="html">
-&lt;p&gt;今天看&lt;a href=&quot;http://underscorejs.org/&quot;&gt;underscore.js&lt;/a&gt;的collections部分。&lt;/p&gt;
-
-&lt;p&gt;Note: 所有数组函数对于 arguments 对象一样有用，不只是针对稀疏数组。&lt;/p&gt;
-
-&lt;p&gt;导航：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#first&quot;&gt;first&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#initial&quot;&gt;initial&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#last&quot;&gt;last&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#compact&quot;&gt;compact&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#flatten&quot;&gt;flatten&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#without&quot;&gt;without&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#union&quot;&gt;union&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#intersection&quot;&gt;intersection&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#difference&quot;&gt;difference&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#uniq&quot;&gt;uniq&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#zip&quot;&gt;zip&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#object&quot;&gt;object&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#indexOf&quot;&gt;indexOf&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#lastIndexOf&quot;&gt;lastIndexOf&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#sortedIndex&quot;&gt;sortedIndex&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#range&quot;&gt;range&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;first&quot;&gt;first&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.first(array, [n]) Alias: head, take  &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;没有传参数n，返回数组的第一个元素&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;传参数n，返回数组的前n个元素&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.first([5, 4, 3, 2, 1]);
-  =&amp;gt; 5
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;initial&quot;&gt;initial&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.initial(array, [n]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;没有参数n，返回数组中除最后一个元素之外的其他元素&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;传入参数n，返回数组中除最后n个元素之外的其他元素&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.initial([5, 4, 3, 2, 1]);
-  =&amp;gt; [5, 4, 3, 2]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;last&quot;&gt;last&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.last(array, [n]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;没有参数n，返回数组的最后一个元素&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;有参数n，返回数组最后的n个元素&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.last([5, 4, 3, 2, 1]);
-  =&amp;gt; 1
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;rest&quot;&gt;rest&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.rest(array, [index]) Alias: tail, drop &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;没有参数index，返回数组中除第一个元素的其他元素&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;有参数index，返回数组中除indx位置元素的其他元素&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.rest([5, 4, 3, 2, 1]);
-  =&amp;gt; [4, 3, 2, 1]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;compact&quot;&gt;compact&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.compact(array) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;返回一个数组的副本，除去非空元素&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;被判定为空的为：false, null, 0, “”, undefined and NaN &lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.compact([0, 1, false, 2, &#39;&#39;, 3]);
-  =&amp;gt; [1, 2, 3]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;flatten&quot;&gt;flatten&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.flatten(array, [shallow]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;没有shallow，把嵌套多层的元素转换成只有一层的。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;shallow 为true时，只是去掉元素的一层嵌套&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.flatten([1, [2], [3, [[4]]]]);
-  =&amp;gt; [1, 2, 3, 4];
-
-  _.flatten([1, [2], [3, [[4]]]], true);
-  =&amp;gt; [1, 2, 3, [[4]]];
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;without&quot;&gt;without&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.without(array, *values) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回排除所有values值得数组副本&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.without([1, 2, 1, 0, 3, 1, 4], 0, 1);
-  =&amp;gt; [2, 3, 4]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;union&quot;&gt;union&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.union(*arrays) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回结合后的数组：每个元素都是独一无二的。可以传入一个或多个数组。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.union([1, 2, 3], [101, 2, 1, 10], [2, 1]);
-  =&amp;gt; [1, 2, 3, 101, 10]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;intersection&quot;&gt;intersection&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.intersection(*arrays) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回一个或多个数组中元素的交集，即返回一个的元素在每一个数组里&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.intersection([1, 2, 3], [101, 2, 1, 10], [2, 1]);
-  =&amp;gt; [1, 2]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;difference&quot;&gt;difference&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.difference(array, *others) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;和without类似，但返回的是array中吧不在others数组中的元素&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.difference([1, 2, 3, 4, 5], [5, 2, 10]);
-  =&amp;gt; [1, 3, 4]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;uniq&quot;&gt;uniq&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.uniq(array, [isSorted], [iteratee]) Alias: unique  &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;数组去重，用 === 进行测试。&lt;/li&gt;
-  &lt;li&gt;如果数组已排序，传入isSorted 为true，这样这个方法的速度会快很多。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;也可传入iteratee去比较元素是否相同&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.uniq([1, 2, 1, 3, 1, 4]);
-  =&amp;gt; [1, 2, 3, 4]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;zip&quot;&gt;zip&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.zip(*arrays) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;合并每个数组的每个元素，并保留对应位置。&lt;/li&gt;
-  &lt;li&gt;在合并分开保存的数据时很常用。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果处理矩阵相似数组，_.zip.apply会达到相同的效果。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.zip([&#39;moe&#39;, &#39;larry&#39;, &#39;curly&#39;], [30, 40, 50], [true, false, false]);
-  =&amp;gt; [[&quot;moe&quot;, 30, true], [&quot;larry&quot;, 40, false], [&quot;curly&quot;, 50, false]]
-
-  _.zip.apply(_, arrayOfRowsOfData);
-  =&amp;gt; arrayOfColumnsOfData
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;object&quot;&gt;object&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.object(list, [values]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;把数组转变成对象。&lt;/li&gt;
-  &lt;li&gt;数组的元素可以为[key, value]形式，也可以一个数组的元素全为key，一个数组的元素全为value。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果存在重复key，后一个会被应用。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.object([&#39;moe&#39;, &#39;larry&#39;, &#39;curly&#39;], [30, 40, 50]);
-  =&amp;gt; {moe: 30, larry: 40, curly: 50}
-
-  _.object([[&#39;moe&#39;, 30], [&#39;larry&#39;, 40], [&#39;curly&#39;, 50]]);
-  =&amp;gt; {moe: 30, larry: 40, curly: 50}
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;indexof&quot;&gt;indexOf&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.indexOf(array, value, [isSorted]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;返回元素在数组中的索引，没有则返回-1。&lt;/li&gt;
-  &lt;li&gt;如果数组已排序，传入isSorted为true，这样会采用更快速的二分排序法查找元素。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;可以传入一个数字，以便在指定索引之后寻找对应值。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.indexOf([1, 2, 3], 2);
-  =&amp;gt; 1
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;lastindexof&quot;&gt;lastIndexOf&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.lastIndexOf(array, value, [fromIndex]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;返回元素在数组中最后出现的位置，没有则返回-1。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;传入fromIndex则在指定位置开始查找。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.lastIndexOf([1, 2, 3, 1, 2, 3], 2);
-  =&amp;gt; 4
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;sortedindex&quot;&gt;sortedIndex&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.sortedIndex(list, value, [iteratee], [context]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;为了保持list的顺序，采用二分搜索去查找value应该插入到list中对应的值。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果传入iteratee，则用来计算每个元素的值，包括value。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.sortedIndex([10, 20, 30, 40, 50], 35);
-  =&amp;gt; 3
-
-  var stooges = [{name: &#39;moe&#39;, age: 40}, {name: &#39;curly&#39;, age: 60}];
-  _.sortedIndex(stooges, {name: &#39;larry&#39;, age: 50}, &#39;age&#39;);
-  =&amp;gt; 1
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;range&quot;&gt;range&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.range([start], stop, [step]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;一个简单创建整数数组的函数，each和map循环的简便版本。&lt;/li&gt;
-  &lt;li&gt;start默认为0，step默认为1。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回一个数组，包含从start到stop内（不包括stop）以step递增（递减）的函数。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.range(10);
-  =&amp;gt; [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-  _.range(1, 11);
-  =&amp;gt; [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-  _.range(0, 30, 5);
-  =&amp;gt; [0, 5, 10, 15, 20, 25]
-  _.range(0, -10, -1);
-  =&amp;gt; [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
-  _.range(0);
-  =&amp;gt; []
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-</content>
- </entry>
- 
- <entry>
    <title>2014年回顾</title>
-   <link href="jeffdeng.me/2015/01/04/year-review.html"/>
+   <link href="jeffdeng.me/plan/2015/01/04/year-review"/>
    <updated>2015-01-04T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2015/01/04/year-review</id>
+   <id>jeffdeng.me/plan/2015/01/04/year-review</id>
    <content type="html">
 &lt;p&gt;2015年匆匆的赶来了，100秒钟都不多给，好坏的。&lt;/p&gt;
 
@@ -546,7 +104,7 @@ delete from `User` where uid=&#39;103&#39;;
 下面是看过的(我都有实体书)：&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;活法 稻盛和夫 &lt;/li&gt;
+  &lt;li&gt;活法 稻盛和夫&lt;/li&gt;
   &lt;li&gt;因为疼痛所以叫青春&lt;/li&gt;
   &lt;li&gt;1988我想和这个世界谈谈&lt;/li&gt;
   &lt;li&gt;这些道理没人告诉你&lt;/li&gt;
@@ -573,433 +131,10 @@ delete from `User` where uid=&#39;103&#39;;
  </entry>
  
  <entry>
-   <title>underscore.js Api -- collections</title>
-   <link href="jeffdeng.me/2015/01/04/underscorejs-collections.html"/>
-   <updated>2015-01-04T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2015/01/04/underscorejs-collections</id>
-   <content type="html">
-&lt;blockquote&gt;
-  &lt;p&gt;转眼到了2015年，这一年还是要努力啊，赚钱赚钱赚钱。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;今天看&lt;a href=&quot;http://underscorejs.org/&quot;&gt;underscore.js&lt;/a&gt;的collections部分。&lt;/p&gt;
-
-&lt;p&gt;导航：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#each&quot;&gt;each&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#map&quot;&gt;map&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#reduce&quot;&gt;reduce&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#reduceRight&quot;&gt;reduceRight&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#find&quot;&gt;find&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#filter&quot;&gt;filter&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#where&quot;&gt;where&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#findWhere&quot;&gt;findWhere&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#reject&quot;&gt;reject&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#every&quot;&gt;every&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#some&quot;&gt;some&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#contains&quot;&gt;contains&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#invoke&quot;&gt;invoke&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#pluck&quot;&gt;pluck&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#max&quot;&gt;max&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#min&quot;&gt;min&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#sortBy&quot;&gt;sortBy&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#groupBy&quot;&gt;groupBy&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#indexBy&quot;&gt;indexBy&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#countBy&quot;&gt;countBy&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#shuffle&quot;&gt;shuffle&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#sample&quot;&gt;sample&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#toArray&quot;&gt;toArray&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#size&quot;&gt;size&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#partition&quot;&gt;partition&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;collection-functions-arrays-or-objects--&quot;&gt;Collection Functions (Arrays or Objects)  集合函数，参数是数组或对象&lt;/h2&gt;
-
-&lt;p&gt;Tip: Collection函数的参数可以是array， objects, 和array-like objects(类似数组对象)，
-就如arguments(函数参数)，NodeList(Dom节点列表)和类似的对象。但由于其工作方式是duck-typing(鸭子模式？)，
-所以避免传入的对象有length属性。&lt;/p&gt;
-
-&lt;h4 id=&quot;each&quot;&gt;each&lt;/h4&gt;
-&lt;p&gt;&lt;code&gt;_.each(list, iteratee, [context])，Alias(别名): forEach&lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;对于list里的每一个元素进行iteratee(迭代)函数的操作。&lt;/li&gt;
-  &lt;li&gt;当list是数组，iteratee的参数是(element, index, list)。&lt;/li&gt;
-  &lt;li&gt;当list是对象，iteratee的参数是(value, key, list)。&lt;/li&gt;
-  &lt;li&gt;each循环是不能中断的，如果要中断，可以用_.find代替&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回原list&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.each([1, 2, 3], function(element, index, list) { });
-  _.each({one: 1, two: 2, three: 3}, function(value, key, list) { });
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;map&quot;&gt;map&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;_.map(list, iteratee, [context]) Alias: collect&lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;和each很相似，参数都一样。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回的是处理后的数组&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.map([1, 2, 3], function(num){ return num * 3; });
-  =&amp;gt; [3, 6, 9]
-  _.map({one: 1, two: 2, three: 3}, function(num, key){ return num * 3; });
-  =&amp;gt; [3, 6, 9]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;reduce&quot;&gt;reduce&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;_.reduce(list, iteratee, [memo], [context]) Aliases: inject, foldl&lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;reduce把list里的所有值迭代成一个值。&lt;/li&gt;
-  &lt;li&gt;memo是迭代的初始值，参与每次迭代。如果没有定义memo的初值，memo则为list的第一个值。迭代从list的第二个元素开始。&lt;/li&gt;
-  &lt;li&gt;iteratee的参数(memo, value, index, list)&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回迭代的最终值。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var sum = _.reduce([1, 2, 3], function(memo, num){ return memo + num; }, 0);
-  =&amp;gt; 6
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;reduceright&quot;&gt;reduceRight&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;_.reduceRight(list, iteratee, memo, [context]) Alias: foldr&lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;reduce的右结合版本。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果javascript原生存在(v1.8)，则调用原生的reduceRight。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var list = [[0, 1], [2, 3], [4, 5]];
-  var flat = _.reduceRight(list, function(a, b) { return a.concat(b); }, []);
-  =&amp;gt; [4, 5, 2, 3, 0, 1]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;find&quot;&gt;find&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.find(list, predicate, [context]) Alias: detect &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;predicate的参数是&lt;code&gt;(value, key, list)&lt;/code&gt;。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回list中，第一个通过predicate验收的值。如果所有值都不通过验证，则返回undefined。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var even = _.find([1, 2, 3, 4, 5, 6], function(num){ return num % 2 == 0; });
-  =&amp;gt; 2
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;filter&quot;&gt;filter&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.filter(list, iterator, [context]) 别名: select &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;find的全局版本，返回list中所有通过predicate验证的的数组。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var evens = _.filter([1, 2, 3, 4, 5, 6], function(num){ return num % 2 == 0; });
-  =&amp;gt; [2, 4, 6]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;where&quot;&gt;where&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.where(list, properties) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;对list中的每一个元素进行检查，返回数组。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回数组里的每一项都包含properties的所有属性。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.where(listOfPlays, {author: &quot;Shakespeare&quot;, year: 1611});
-  =&amp;gt; [{title: &quot;Cymbeline&quot;, author: &quot;Shakespeare&quot;, year: 1611},
-      {title: &quot;The Tempest&quot;, author: &quot;Shakespeare&quot;, year: 1611}]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;findwhere&quot;&gt;findWhere&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.findWhere(list, properties) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;where的单一版本，返回list中第一个包含properties所有属性的元素。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果没有，返回undefined。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.findWhere(publicServicePulitzers, {newsroom: &quot;The New York Times&quot;});
-  =&amp;gt; {year: 1918, newsroom: &quot;The New York Times&quot;,
-    reason: &quot;For its public service in publishing in full so many official reports,
-    documents and speeches by European statesmen relating to the progress and
-    conduct of the war.&quot;}
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;reject&quot;&gt;reject&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;_.reject(list, predicate, [context]) &lt;/code&gt; &lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;filter的相反函数，返回list中不符合predicate函数的值。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var odds = _.reject([1, 2, 3, 4, 5, 6], function(num){ return num % 2 == 0; });
-  =&amp;gt; [1, 3, 5]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;every&quot;&gt;every&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.every(list, [predicate], [context]) Alias: all &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果list中的所有值都通过predicate验证，返回true，否则返回false。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.every([true, 1, null, &#39;yes&#39;], _.identity);
-  =&amp;gt; false
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;some&quot;&gt;some&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.some(list, [predicate], [context]) Alias: any &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果list中的任意一个元素通过predicate验证，停止并返回true，否则返回false。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.some([null, 0, &#39;yes&#39;, false]);
-  =&amp;gt; true
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;contains&quot;&gt;contains&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.contains(list, value) Alias: include  &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;如果value在list中，返回true。否则返回false。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果list是数组，调用的是indexOf方法。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.contains([1, 2, 3], 3);
-  =&amp;gt; true
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;invoke&quot;&gt;invoke&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.invoke(list, methodName, *arguments) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;对于list中的每一个元素，调用方法名为methodName的函数。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;传入附加参数，会转给要调用的函数。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.invoke([[5, 1, 7], [3, 2, 1]], &#39;sort&#39;);
-  =&amp;gt; [[1, 5, 7], [1, 2, 3]]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;pluck&quot;&gt;pluck&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.pluck(list, propertyName) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;map的简单版本。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回list中指定属性的值的数组。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var stooges = [{name: &#39;moe&#39;, age: 40}, {name: &#39;larry&#39;, age: 50}, {name: &#39;curly&#39;, age: 60}];
-  _.pluck(stooges, &#39;name&#39;);
-  =&amp;gt; [&quot;moe&quot;, &quot;larry&quot;, &quot;curly&quot;]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;max&quot;&gt;max&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.max(list, [iteratee], [context]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;返回list中最大值的value。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果传入iteratee函数，则以iteratee函数为标准比较。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var stooges = [{name: &#39;moe&#39;, age: 40}, {name: &#39;larry&#39;, age: 50}, {name: &#39;curly&#39;, age: 60}];
-  _.max(stooges, function(stooge){ return stooge.age; });
-  =&amp;gt; {name: &#39;curly&#39;, age: 60};
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;min&quot;&gt;min&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.min(list, [iteratee], [context]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;max的想反函数。返回list中的最小项。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var numbers = [10, 5, 100, 2, 1000];
-  _.min(numbers);
-  =&amp;gt; 2
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;sortby&quot;&gt;sortBy&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.sortBy(list, iteratee, [context]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;返回的是经过排序的list。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;排序的标准是通过比较iteratee函数返回值的大小，或者是属性的名称。如：length。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.sortBy([1, 2, 3, 4, 5, 6], function(num){ return Math.sin(num); });
-  =&amp;gt; [5, 4, 6, 3, 1, 2]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;groupby&quot;&gt;groupBy&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.groupBy(list, iteratee, [context]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;把collection分成一个个的集合。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;分组的标准是iteratee函数每个返回值；如果iteratee是字符串，则通过元素的属性值分组。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.groupBy([1.3, 2.1, 2.4], function(num){ return Math.floor(num); });
-  =&amp;gt; {1: [1.3], 2: [2.1, 2.4]}
-
-  _.groupBy([&#39;one&#39;, &#39;two&#39;, &#39;three&#39;], &#39;length&#39;);
-  =&amp;gt; {3: [&quot;one&quot;, &quot;two&quot;], 5: [&quot;three&quot;]}
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;indexby&quot;&gt;indexBy&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.indexBy(list, iteratee, [context]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;返回的是类似于groupBy的对象，带有索引。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;对于list的任何的元素, iteratee函数返回一个独一无二key。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  var stooges = [{name: &#39;moe&#39;, age: 40}, {name: &#39;larry&#39;, age: 50}, {name: &#39;curly&#39;, age: 60}];
-  _.indexBy(stooges, &#39;age&#39;);
-  =&amp;gt; {
-    &quot;40&quot;: {name: &#39;moe&#39;, age: 40},
-    &quot;50&quot;: {name: &#39;larry&#39;, age: 50},
-    &quot;60&quot;: {name: &#39;curly&#39;, age: 60}
-  }
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;countby&quot;&gt;countBy&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.countBy(list, iteratee, [context]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;把list分组，但返回的是每一组的数目。类似于groupBy。&lt;/p&gt;
-
-    &lt;p&gt;_.countBy([1, 2, 3, 4, 5], function(num) {
-    return num % 2 == 0 ? ‘even’: ‘odd’;
-  });
-  =&amp;gt; {odd: 3, even: 2}&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;shuffle&quot;&gt;shuffle&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.shuffle(list) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回随机乱序数组&lt;/p&gt;
-
-    &lt;p&gt;_.shuffle([1, 2, 3, 4, 5, 6]);
-  =&amp;gt; [4, 1, 6, 3, 5, 2]&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;sample&quot;&gt;sample&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.sample(list, [n]) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;随机返回list中的n个元素，如果n没有定义，则返回一个元素。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.sample([1, 2, 3, 4, 5, 6]);
-  =&amp;gt; 4
-
-  _.sample([1, 2, 3, 4, 5, 6], 3);
-  =&amp;gt; [1, 6, 2]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;toarray&quot;&gt;toArray&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.toArray(list) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;对于任何一个可以被迭代的list，返回一个数组。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;对arguments对象的转换十分有用。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  (function(){ return _.toArray(arguments).slice(1); })(1, 2, 3, 4);
-  =&amp;gt; [2, 3, 4]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;size&quot;&gt;size&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.size(list) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;返回list中元素的个数。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.size({one: 1, two: 2, three: 3});
-  =&amp;gt; 3
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;partition&quot;&gt;partition&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt; _.partition(array, predicate) &lt;/code&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;把array分成两组，一组满足predicate的验证，一组不满足predicate的验证。&lt;/p&gt;
-
-    &lt;pre&gt;&lt;code&gt;  _.partition([0, 1, 2, 3, 4, 5], isOdd);
-  =&amp;gt; [[1, 3, 5], [0, 2, 4]]
-&lt;/code&gt;&lt;/pre&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;参考：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://learningcn.com/underscore/&quot;&gt;http://learningcn.com/underscore/&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-</content>
- </entry>
- 
- <entry>
    <title>java的urlrewritefilter简单使用</title>
-   <link href="jeffdeng.me/2014/12/12/java-urlrewritefilter.html"/>
+   <link href="jeffdeng.me/java/2014/12/12/java-urlrewritefilter"/>
    <updated>2014-12-12T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2014/12/12/java-urlrewritefilter</id>
+   <id>jeffdeng.me/java/2014/12/12/java-urlrewritefilter</id>
    <content type="html">
 &lt;p&gt;由于项目中只用了&lt;code&gt;tomcat&lt;/code&gt;，没有用&lt;code&gt;Apache&lt;/code&gt;，然后想做&lt;code&gt;www&lt;/code&gt;重定向。就如让所有访问&lt;code&gt;baidu.com&lt;/code&gt;都301永久重定向到&lt;code&gt;www.baidu.com&lt;/code&gt;。然后时间紧急，对&lt;code&gt;Apache&lt;/code&gt;不是很熟悉（懒的去配置），就直接用了&lt;code&gt;java&lt;/code&gt;的一个包：
 &lt;code&gt;urlrewritefilter&lt;/code&gt;。&lt;/p&gt;
@@ -1193,9 +328,9 @@ eg, /products/1234 will be passed on to /products/index.jsp?product_id=1234 with
  
  <entry>
    <title>译.css选择器渲染优化</title>
-   <link href="jeffdeng.me/2014/12/08/css-selector.html"/>
+   <link href="jeffdeng.me/css/2014/12/08/css-selector"/>
    <updated>2014-12-08T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2014/12/08/css-selector</id>
+   <id>jeffdeng.me/css/2014/12/08/css-selector</id>
    <content type="html">
 &lt;p&gt;原文：&lt;a href=&quot;http://calendar.perfplanet.com/2011/css-selector-performance-has-changed-for-the-better/&quot;&gt;css selector performance has changed&lt;/a&gt;。这里来看看这篇文章的主要内容。&lt;/p&gt;
 
@@ -1226,7 +361,7 @@ eg, /products/1234 will be passed on to /products/index.jsp?product_id=1234 with
 &lt;h3 id=&quot;section&quot;&gt;&lt;strong&gt;共享样式&lt;/strong&gt;&lt;/h3&gt;
 &lt;p&gt;共享样式允许浏览器根据已经匹配到得元素，快速找出其他相同样式的元素。&lt;/p&gt;
 
-&lt;p&gt;ex: &lt;/p&gt;
+&lt;p&gt;ex:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;&amp;lt;div&amp;gt;
   &amp;lt;p&amp;gt;foo&amp;lt;/p&amp;gt;
@@ -1278,9 +413,9 @@ css规则是否是在当前的元素集合中（The bloom filter tests whether a
  
  <entry>
    <title>译.css性能</title>
-   <link href="jeffdeng.me/2014/12/08/css-performance.html"/>
+   <link href="jeffdeng.me/css/2014/12/08/css-performance"/>
    <updated>2014-12-08T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2014/12/08/css-performance</id>
+   <id>jeffdeng.me/css/2014/12/08/css-performance</id>
    <content type="html">
 &lt;p&gt;原文：&lt;a href=&quot;https://dl.dropboxusercontent.com/u/39519/talks/cssperf/index.html&quot;&gt;CSS Performance&lt;/a&gt;（2011年文章，有着很赞的翻转效果，前提是祭出高级浏览器）&lt;/p&gt;
 
@@ -1322,7 +457,7 @@ css规则是否是在当前的元素集合中（The bloom filter tests whether a
 
 &lt;p&gt;一个很重要的方法让页面的不假死，就是让分开的Dom操作放在一起。&lt;/p&gt;
 
-&lt;p&gt;ex: &lt;/p&gt;
+&lt;p&gt;ex:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;// 一般，触发两次布局
 var newWidth = aDiv.offsetWidth + 10; // Read
@@ -1403,10 +538,10 @@ getComputedStyle(), scrollBy(), scrollTo(), scrollX, scrollY, webkitConvertPoint
 &lt;h2 id=&quot;css-1&quot;&gt;&lt;strong&gt;3.避免高消耗css&lt;/strong&gt;&lt;/h2&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;@font-face &lt;/li&gt;
-  &lt;li&gt;box-shadow &lt;/li&gt;
-  &lt;li&gt;opacity compositing &lt;/li&gt;
-  &lt;li&gt;gradients &lt;/li&gt;
+  &lt;li&gt;@font-face&lt;/li&gt;
+  &lt;li&gt;box-shadow&lt;/li&gt;
+  &lt;li&gt;opacity compositing&lt;/li&gt;
+  &lt;li&gt;gradients&lt;/li&gt;
   &lt;li&gt;text-align&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -1476,9 +611,9 @@ getComputedStyle(), scrollBy(), scrollTo(), scrollX, scrollY, webkitConvertPoint
  
  <entry>
    <title>译.层叠和选择器的明确度--权重</title>
-   <link href="jeffdeng.me/2014/12/05/css-specificity-wars.html"/>
+   <link href="jeffdeng.me/css/2014/12/05/css-specificity-wars"/>
    <updated>2014-12-05T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2014/12/05/css-specificity-wars</id>
+   <id>jeffdeng.me/css/2014/12/05/css-specificity-wars</id>
    <content type="html">
 &lt;p&gt;这是2005年的文章，内容已经比较老，看看就好。&lt;/p&gt;
 
@@ -1493,7 +628,7 @@ Andy Clarke，是一个英国的的设计师，作者，同时是在设计，css
 
 &lt;ol&gt;
   &lt;li&gt;&lt;code&gt;id&lt;/code&gt;选择器的权重是 100&lt;/li&gt;
-  &lt;li&gt;&lt;code&gt;class&lt;/code&gt;选择器的权重是 10 &lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;class&lt;/code&gt;选择器的权重是 10&lt;/li&gt;
   &lt;li&gt;&lt;code&gt;HTML&lt;/code&gt;选择器的权重为 1&lt;/li&gt;
   &lt;li&gt;选择器的权重就是对应数字加起来&lt;/li&gt;
 &lt;/ol&gt;
@@ -1523,9 +658,9 @@ Andy Clarke，是一个英国的的设计师，作者，同时是在设计，css
  
  <entry>
    <title>前端编码规范（2）-- css</title>
-   <link href="jeffdeng.me/2014/12/05/code-standers-2.html"/>
+   <link href="jeffdeng.me/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/2014/12/05/code-standers-2"/>
    <updated>2014-12-05T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2014/12/05/code-standers-2</id>
+   <id>jeffdeng.me/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/2014/12/05/code-standers-2</id>
    <content type="html">
 &lt;p&gt;接着之前，再来看看css的编码规范。&lt;/p&gt;
 
@@ -1552,9 +687,9 @@ Andy Clarke，是一个英国的的设计师，作者，同时是在设计，css
  
  <entry>
    <title>前端编码规范（1）-- html</title>
-   <link href="jeffdeng.me/2014/12/04/code-standers-1.html"/>
+   <link href="jeffdeng.me/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/2014/12/04/code-standers-1"/>
    <updated>2014-12-04T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2014/12/04/code-standers-1</id>
+   <id>jeffdeng.me/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/2014/12/04/code-standers-1</id>
    <content type="html">
 &lt;p&gt;搞前端也挺久了，但代码一直没有规范的写，都是随心所欲，爱咋咋地。最近QL师兄丢了网站过来，真心给力，前端的都可以去看看。&lt;a href=&quot;http://coderlmn.github.io/code-standards/&quot;&gt;isobar编码规范&lt;/a&gt;。下面把一些我认为比较重要的copy出来。&lt;/p&gt;
 
@@ -1665,9 +800,9 @@ Andy Clarke，是一个英国的的设计师，作者，同时是在设计，css
  
  <entry>
    <title>express的诡异错误</title>
-   <link href="jeffdeng.me/2014/12/03/express-fail.html"/>
+   <link href="jeffdeng.me/nodejs/2014/12/03/express-fail"/>
    <updated>2014-12-03T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2014/12/03/express-fail</id>
+   <id>jeffdeng.me/nodejs/2014/12/03/express-fail</id>
    <content type="html">
 &lt;p&gt;最近用 &lt;code&gt;express&lt;/code&gt; 新建项目，发现一个很诡异的问题，出现的简直毫无理由。我的exprss 版本是&lt;code&gt;4.9.0&lt;/code&gt;&lt;/p&gt;
 
@@ -1761,9 +896,9 @@ $ gem install compass
  
  <entry>
    <title>2014年目标，计划</title>
-   <link href="jeffdeng.me/2014/02/20/plan.html"/>
+   <link href="jeffdeng.me/plan/2014/02/20/plan"/>
    <updated>2014-02-20T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2014/02/20/plan</id>
+   <id>jeffdeng.me/plan/2014/02/20/plan</id>
    <content type="html">
 &lt;blockquote&gt;
   &lt;p&gt;注：原文发布于豆瓣上。&lt;/p&gt;
@@ -1801,9 +936,9 @@ $ gem install compass
  
  <entry>
    <title>Jekyll Introduction</title>
-   <link href="jeffdeng.me/2011/12/29/jekyll-introduction.html"/>
+   <link href="jeffdeng.me/lessons/2011/12/29/jekyll-introduction"/>
    <updated>2011-12-29T00:00:00+08:00</updated>
-   <id>jeffdeng.me/2011/12/29/jekyll-introduction</id>
+   <id>jeffdeng.me/lessons/2011/12/29/jekyll-introduction</id>
    <content type="html">
 &lt;p&gt;This Jekyll introduction will outline specifically  what Jekyll is and why you would want to use it.
 Directly following the intro we’ll learn exactly &lt;em&gt;how&lt;/em&gt; Jekyll does what it does.&lt;/p&gt;
@@ -2217,7 +1352,7 @@ As noted, our main programming constraint is the fact that our API is limited to
 
 &lt;h2 id=&quot;next-steps&quot;&gt;Next Steps&lt;/h2&gt;
 
-&lt;p&gt;Please take a look at &lt;a href=&quot;/2015/01/05/underscorejs-array.html&quot;&gt;underscore.js Api – array&lt;/a&gt;
+&lt;p&gt;Please take a look at []()
 or jump right into &lt;a href=&quot;&quot;&gt;Usage&lt;/a&gt; if you’d like.&lt;/p&gt;
 </content>
  </entry>
