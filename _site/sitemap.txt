@@ -14,8 +14,5 @@ jeffdeng.me/java/2014/12/12/java-urlrewritefilter
 jeffdeng.me/css/2014/12/08/css-selector
 jeffdeng.me/css/2014/12/08/css-performance
 jeffdeng.me/css/2014/12/05/css-specificity-wars
-jeffdeng.me/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/2014/12/05/code-standers-2
-jeffdeng.me/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/2014/12/04/code-standers-1
 jeffdeng.me/nodejs/2014/12/03/express-fail
 jeffdeng.me/plan/2014/02/20/plan
-jeffdeng.me/lessons/2011/12/29/jekyll-introduction
