@@ -4,7 +4,7 @@
  <title>萝拔</title>
  <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2015-05-18T15:42:38+08:00</updated>
+ <updated>2015-08-15T11:28:20+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
@@ -13,11 +13,214 @@
 
  
  <entry>
+   <title>canvas分辨率问题</title>
+   <link href="jeffdeng.me/js/2015/07/06/canvas-resolution"/>
+   <updated>2015-07-06T00:00:00+08:00</updated>
+   <id>jeffdeng.me/js/2015/07/06/canvas-resolution</id>
+   <content type="html">
+&lt;p&gt;过程：最近尝试用H5的canvas写了个小游戏，然后加载图片的时候发现，在电脑上图片是很清晰的，但到了手机上就看到比较模糊（图片都是实际大小的2倍）。&lt;/p&gt;
+
+&lt;p&gt;再现：demo代码如下&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;window.onload = function () {
+	var canvas = document.getElementById(&#39;canvas1&#39;);
+	var ctx = canvas.getContext(&quot;2d&quot;);
+	var width, height;
+	width = 320;
+	height = 568;
+
+	canvas.style.width = width+&#39;px&#39;;
+	canvas.style.height = height + &#39;px&#39;;
+	canvas.width = width; 
+	canvas.height = height;
+	var img = new Image();
+	img.src = &quot;../img/s6_1.png&quot;;
+	img.onload = function () {  
+	    ctx.drawImage(img, 20, 20, img.width/2, img.height/2); 
+	}  
+}();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;先看效果图（左边为电脑模拟，右边为手机）：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2015/20150706canvas/1_pc.png&quot; alt=&quot;电脑&quot; /&gt;
+&lt;img src=&quot;/images/2015/20150706canvas/2_phone.jpg&quot; alt=&quot;手机&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;有没有发现什么？认真看就会发现：右边的图比较模糊（如果实在没发现请自戳双目，为什么？因为留着没用）。&lt;/p&gt;
+
+&lt;p&gt;所以现在问题是：&lt;code&gt;为什么canvas加载图片在手机上会显示模糊？&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;首先我们看看上面的代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;canvas.style.width = width+&#39;px&#39;;
+canvas.style.height = height + &#39;px&#39;;
+canvas.width = width; 
+canvas.height = height;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样子写是不是有点多此一举了？闲的蛋疼？为了证明不是蛋疼，首先我们要了解&lt;code&gt;设备像素&lt;/code&gt;和&lt;code&gt;CSS像素&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;css&quot;&gt;设备像素和CSS像素&lt;/h3&gt;
+
+&lt;p&gt;设备像素就是我们平时所说的设备真实像素，像iPhone5s的 640 x 1136。但一般开发者是不怎么关心这个数值的，因为有CSS像素。&lt;/p&gt;
+
+&lt;p&gt;CSS像素是我们平时代码直接用的，iPhone5s的CSS像素为 320 x 568（这样子应该懂了吧）。&lt;/p&gt;
+
+&lt;p&gt;由于设备像素和CSS像素不一样，所以设备会用几个设备像素表示一个CSS像素。像iPhone5s就是4个设备像素点表示一个CSS像素。如图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2015/20150706canvas/3_px.gif&quot; alt=&quot;像素比例&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这里就有一个很常见的问题：为什么图片在retina屏中会模糊？&lt;/p&gt;
+
+&lt;p&gt;例如要显示 100px x 100px 的图片，如果切出来的图片也是 100px x 100px，那么在iPhone5s下是肯定会模糊的。
+因为iPhone5s的 设备像素/CSS像素 比是2。所以它需要的图片实际大小为 200px x 200px。如果像现在这样大小不够呢？那像素点只能被扩充了。&lt;/p&gt;
+
+&lt;p&gt;什么是扩充？就是5s的4个设备像素点表示1个CSS像素点时候，本应该4个像素点都有各自的颜色的，但图片小了，那4个设备像素点都是复制成同一种颜色。十分简单粗暴的方法。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;canvas的显示也是类似于图片，如果不够大就会被扩充。&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;canvas.width/height&lt;/code&gt; 表示的是设备像素，而 &lt;code&gt;canvas.style.width/height&lt;/code&gt; 表示的是CSS像素。所以设置&lt;code&gt;canvas.width/height==canvas.style.width/height&lt;/code&gt;的时候，如果 设备像素/CSS像素 不是1，canvas就被扩充了，然后图片加载进去，虽然是2倍实际大小，但还是模糊掉了（这里没想通？再想想）。这样就很好解析刚刚的例子在电脑端没有模糊（我的电脑像素比是1），但在手机端却模糊了（还不明白？不是我的问题就是你的问题了）。&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;解决方法&lt;/h3&gt;
+
+&lt;p&gt;既然问题出现了，总是会有解决方法的。先看两个参数 &lt;code&gt;devicePixelRatio&lt;/code&gt;和&lt;code&gt;webkitBackingStorePixelRatio&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h4 id=&quot;devicepixelratio&quot;&gt;devicePixelRatio&lt;/h4&gt;
+
+&lt;p&gt;devicePixelRatio是window下的属性，是 设备像素/CSS像素 的比值。下面列出了一些：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;iPhone5s 		2&lt;/li&gt;
+  &lt;li&gt;iPhone6 plus  3&lt;/li&gt;
+  &lt;li&gt;nexus7 		1.3 (非常奇葩)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个参数比较简单直观，不用多说。其实在chrome模拟手机浏览的时候，也有这个参数的，如图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2015/20150706canvas/4_pc_px.png&quot; alt=&quot;chrome模拟像素比&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;上图中红色框中的就是这个像素比。&lt;/p&gt;
+
+&lt;h4 id=&quot;webkitbackingstorepixelratio&quot;&gt;webkitBackingStorePixelRatio&lt;/h4&gt;
+
+&lt;p&gt;webkitBackingStorePixelRatio是存在canvas context中（仅safari和chrome），该属性的值决定了浏览器在渲染canvas之前会用几个像素来存储画布信息。
+例如，在iOS6 safari中这个值为2，它要渲染 100px x 100px 的图片，首先会在内存中生成一张200x200的图片，然后浏览器渲染的时候，会按100x100的图片来渲染，
+因此就变成了200x200，正好和内存中的图片大小一致，因此在iOS的safari中不会出现失真的问题（有点绕口，慢慢理解）。&lt;/p&gt;
+
+&lt;p&gt;但是在iOS7 的safari中这个值又变成了1，是出于性能的考虑，详情可以看&lt;a href=&quot;http://asciiwwdc.com/2013/sessions/600&quot;&gt;这里&lt;/a&gt;，搜索关键字‘backing’。&lt;/p&gt;
+
+&lt;p&gt;知道了这俩个参数，那接下来怎么玩？实践是检验真理的唯一标准。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;实践&lt;/h3&gt;
+
+&lt;p&gt;修改之前的代码，把像素比加进去：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var PIXEL_RATIO = (function () {
+    var ctx = document.createElement(&quot;canvas&quot;).getContext(&quot;2d&quot;),
+        dpr = window.devicePixelRatio || 1,
+        bsr = ctx.webkitBackingStorePixelRatio ||
+              ctx.mozBackingStorePixelRatio ||
+              ctx.msBackingStorePixelRatio ||
+              ctx.oBackingStorePixelRatio ||
+              ctx.backingStorePixelRatio || 1;
+
+    return dpr / bsr;
+})();
+
+window.onload = function () {
+	var canvas = document.getElementById(&#39;canvas1&#39;);
+	var ctx = canvas.getContext(&quot;2d&quot;);
+	var width, height;
+	width = 320;
+	height = 568;
+
+	canvas.style.width = width+&#39;px&#39;;
+	canvas.style.height = height + &#39;px&#39;;
+	canvas.width = width * PIXEL_RATIO; 
+	canvas.height = height * PIXEL_RATIO;
+	var img = new Image();
+	img.src = &quot;../img/s6_1.png&quot;;
+	img.onload = function () {  
+	    ctx.drawImage(img, 20, 20, img.width/2, img.height/2); 
+	}  
+}();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;看看效果（左边为之前效果，右边为修改后效果）：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2015/20150706canvas/1_pc.png&quot; alt=&quot;之前&quot; /&gt;
+&lt;img src=&quot;/images/2015/20150706canvas/5_pc.png&quot; alt=&quot;之后&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;发现了什么？图居然缩小了！我滴天，这是为什么？认真想想问题出在哪里。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;因为CSS像素点被缩放了&lt;/code&gt;，为什么会缩放？因为它是大爷，它想缩所以缩了。&lt;/p&gt;
+
+&lt;p&gt;所以解决方案是对canvas进行缩放，下面是完整版代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var PIXEL_RATIO = (function () {
+	    var ctx = document.createElement(&quot;canvas&quot;).getContext(&quot;2d&quot;),
+	        dpr = window.devicePixelRatio || 1,
+	        bsr = ctx.webkitBackingStorePixelRatio ||
+	              ctx.mozBackingStorePixelRatio ||
+	              ctx.msBackingStorePixelRatio ||
+	              ctx.oBackingStorePixelRatio ||
+	              ctx.backingStorePixelRatio || 1;
+
+	    return dpr / bsr;
+})();
+
+window.onload = function () {
+	var canvas = document.getElementById(&#39;canvas1&#39;);
+	var ctx = canvas.getContext(&quot;2d&quot;);
+	var width, height;
+	width = 320;
+	height = 568;
+
+	canvas.style.width = width+&#39;px&#39;;
+	canvas.style.height = height + &#39;px&#39;;
+	canvas.width = width * PIXEL_RATIO; 
+	canvas.height = height * PIXEL_RATIO;
+
+	ctx.scale(PIXEL_RATIO, PIXEL_RATIO);
+
+	var img = new Image();
+	img.src = &quot;../img/s6_1.png&quot;;
+	img.onload = function () {  
+	    ctx.drawImage(img, 20, 20); 
+	}  
+}();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;左边是电脑之前模拟的效果，右边是电脑现在模拟的效果：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2015/20150706canvas/1_pc.png&quot; alt=&quot;之前电脑&quot; /&gt;
+&lt;img src=&quot;/images/2015/20150706canvas/7_pc.png&quot; alt=&quot;之后电脑&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;左边是手机之前的效果，右边是手机现在的效果：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2015/20150706canvas/2_phone.jpg&quot; alt=&quot;之前手机&quot; /&gt;
+&lt;img src=&quot;/images/2015/20150706canvas/8_ph.jpg&quot; alt=&quot;之后手机&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;嗯，基本的解决方案就是这样。如果有问题，可以提出来～&lt;/p&gt;
+
+&lt;p&gt;参考：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://blog.csdn.net/laijingyao881201/article/details/39505043&quot;&gt;http://blog.csdn.net/laijingyao881201/article/details/39505043&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.html5rocks.com/en/tutorials/canvas/hidpi/&quot;&gt;http://www.html5rocks.com/en/tutorials/canvas/hidpi/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
    <title>2015展望</title>
    <link href="jeffdeng.me/plan/2015/01/08/plan"/>
    <updated>2015-01-08T00:00:00+08:00</updated>
    <id>jeffdeng.me/plan/2015/01/08/plan</id>
    <content type="html">
+&lt;p&gt;TP:008D7BD6&lt;/p&gt;
+
 &lt;p&gt;新的一年，总得写点什么，例如立下些雄心壮志的目标之类。虽然最后往往都是不了了之，但还是可以很装的说一句：立过。&lt;/p&gt;
 
 &lt;p&gt;这一年大目标：&lt;/p&gt;
@@ -74,7 +277,7 @@
 
 &lt;p&gt;那一年过去了，哪些实现了？你觉得哪些可以实现？上面说买各种东西说的是用自己赚的钱买的。说这个的时候才大三开学，对前途一片渺茫。我都不知道怎么突然会有这样的想法。当时和我姐说过，我姐轻轻的说，不现实~其实有愿望还是好的，如果最后没有实现，但这个愿望毕竟在一段时间里给过你力量。&lt;/p&gt;
 
-&lt;p&gt;恩，结果是没有买mx3，不过买了mx4，kindle也买了。山地车没有买，也没有去海南环岛（好遗憾）。mac pro 也准备买了，就等等师兄过HK（我没有办通行证啊摔）。&lt;/p&gt;
+&lt;p&gt;恩，结果是没有买mx3，不过买了mx4，kindle也买了。山地车没有买，也没有去海南环岛（好遗憾）。&lt;s&gt;mac pro 也准备买了，就等等师兄过HK（我没有办通行证啊摔）&lt;/s&gt;最后还是没有买，用着公司的mini。&lt;/p&gt;
 
 &lt;p&gt;然后3月份开始还是有锻炼的，然后去走了传说中百公里。对于我这样虚弱的存在，你觉得走了多少公里呢？什么，至少99公里？恩，我计划也是这样的。然后事实是~~走了40多公里而已，从深圳湾开始一直走到梧桐山。从晚上6点左右出发，一直走到第二天早上7点多。虽然大脑一直在鞭笞我前进前进前进，但腿还是很诚实的啊，牢牢的粘在地上迈不起来，捂脸。&lt;/p&gt;
 
@@ -434,7 +637,7 @@ css规则是否是在当前的元素集合中（The bloom filter tests whether a
 &lt;h2 id=&quot;section&quot;&gt;&lt;strong&gt;1. 重排&lt;/strong&gt;&lt;/h2&gt;
 &lt;p&gt;先来看看html页面的渲染、绘制流程图&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/render.png&quot; alt=&quot;render&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2014/css_performance/render.png&quot; alt=&quot;render&quot; /&gt;&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;根据&lt;code&gt;Html&lt;/code&gt;标签生成&lt;code&gt;Dom&lt;/code&gt;树（&lt;code&gt;Dom tree&lt;/code&gt;）；根据默认的，用户自定义的样式生成样式结构（&lt;code&gt;Styles struct&lt;/code&gt;）&lt;/li&gt;
@@ -718,7 +921,7 @@ run the app:
 
 &lt;p&gt;首先是浏览器报错：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/QQ20141203-1.png&quot; alt=&quot;chrome-err&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2014/express_fail/20141203-1.png&quot; alt=&quot;chrome-err&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;错误信息是：&lt;code&gt;(failed) net::ERR_CONNECTION_REFUSED&lt;/code&gt; ，其实应该报404错误，因为没有这个样式文件。然后这个时候，控制台也会报错：&lt;/p&gt;
 

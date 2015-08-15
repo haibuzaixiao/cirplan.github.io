@@ -32,4 +32,4 @@ tags : [css, html]
 [3]: http://www.stuffandnonsense.co.uk/archives/css_specificity_wars.html
 [4]: https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Writing_efficient_CSS
 [5]: /2014/12/05/css-specificity-wars.html
-[6]: /images/box_model.png
+[6]: /images/2014/css_stander/box_model.png

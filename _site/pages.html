@@ -19,7 +19,8 @@
     <link href="/assets/themes/bootstrap-3/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
     <!-- Sticky Footer -->
     <link href="/assets/themes/bootstrap-3/bootstrap/css/bs-sticky-footer.css" rel="stylesheet">
-    
+    <!-- prettify -->
+    <link href="/assets/themes/bootstrap-3/bootstrap/css/prettify_github.css" rel="stylesheet" >
     <!-- Custom styles -->
     <link href="/assets/themes/bootstrap-3/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
 
@@ -237,6 +238,13 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/assets/themes/bootstrap-3/bootstrap/js/jquery-1.11.2.min.js"></script>
     <script src="/assets/themes/bootstrap-3/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/assets/themes/bootstrap-3/bootstrap/lib/prettify/prettify.js"></script>
+    <script type="text/javascript">
+    $(function () {
+        $('pre').addClass('prettyprint');
+        prettyPrint();
+    });
+    </script>
   </body>
 </html>
 

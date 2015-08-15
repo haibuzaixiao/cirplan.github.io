@@ -19,7 +19,8 @@
     <link href="/assets/themes/bootstrap-3/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
     <!-- Sticky Footer -->
     <link href="/assets/themes/bootstrap-3/bootstrap/css/bs-sticky-footer.css" rel="stylesheet">
-    
+    <!-- prettify -->
+    <link href="/assets/themes/bootstrap-3/bootstrap/css/prettify_github.css" rel="stylesheet" >
     <!-- Custom styles -->
     <link href="/assets/themes/bootstrap-3/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
 
@@ -157,6 +158,10 @@
     	<li><a href="/categories.html#java-ref">
     		java <span>1</span>
     	</a></li>
+     
+    	<li><a href="/categories.html#js-ref">
+    		js <span>1</span>
+    	</a></li>
     
   
 
@@ -276,6 +281,26 @@
 
 
   </ul>
+ 
+  <h2 id="js-ref">js</h2>
+  <ul>
+      
+    
+
+
+  
+    
+      
+      	
+      	<li><a href="/js/2015/07/06/canvas-resolution">canvas分辨率问题</a></li>
+      	
+      
+    
+  
+
+
+
+  </ul>
 
 
 
@@ -305,6 +330,13 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/assets/themes/bootstrap-3/bootstrap/js/jquery-1.11.2.min.js"></script>
     <script src="/assets/themes/bootstrap-3/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/assets/themes/bootstrap-3/bootstrap/lib/prettify/prettify.js"></script>
+    <script type="text/javascript">
+    $(function () {
+        $('pre').addClass('prettyprint');
+        prettyPrint();
+    });
+    </script>
   </body>
 </html>
 

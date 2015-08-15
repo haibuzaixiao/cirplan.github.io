@@ -59,7 +59,7 @@ tags : [nodejs, express, ejs, compass]
 
 首先是浏览器报错：
 
-![chrome-err](/images/QQ20141203-1.png)
+![chrome-err](/images/2014/express_fail/20141203-1.png)
 
 错误信息是：`(failed) net::ERR_CONNECTION_REFUSED` ，其实应该报404错误，因为没有这个样式文件。然后这个时候，控制台也会报错：
 

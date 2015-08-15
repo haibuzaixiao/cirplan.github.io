@@ -21,7 +21,7 @@ tags : [css, 翻译]
 ## **1. 重排**
 先来看看html页面的渲染、绘制流程图
 
-![render](/images/render.png)
+![render](/images/2014/css_performance/render.png)
 
 1. 根据`Html`标签生成`Dom`树（`Dom tree`）；根据默认的，用户自定义的样式生成样式结构（`Styles struct`）
 2. 生成渲染树（`Render tree`）
