@@ -133,10 +133,10 @@
 <div class="row post">
   <div class="span11">
     <h1 class="title">
-      <a href="/js/2015/07/06/canvas-resolution" title="canvas分辨率问题">canvas分辨率问题</a> 
+      <a href="/trip/2015/09/19/cross" title="穿越东西冲">穿越东西冲</a> 
       
     </h1>
-    <div class="date f-c-b">Date：<span>2015-07-06</span></div>
+    <div class="date f-c-b">Date：<span>2015-09-19</span></div>
     
     <div class="tag-n">
       <span class="tag-tip">Tag:</span>
@@ -147,9 +147,9 @@
 
   
      
-    	<li><a href="/tags.html#js-ref">js <span>1</span></a></li>
+    	<li><a href="/tags.html#徒步-ref">徒步 <span>1</span></a></li>
      
-    	<li><a href="/tags.html#canvas-ref">canvas <span>1</span></a></li>
+    	<li><a href="/tags.html#东西冲-ref">东西冲 <span>1</span></a></li>
     
   
 
@@ -159,197 +159,118 @@
      
       </div>
       
-<p>过程：最近尝试用H5的canvas写了个小游戏，然后加载图片的时候发现，在电脑上图片是很清晰的，但到了手机上就看到比较模糊（图片都是实际大小的2倍）。</p>
+<p>周三的时候突然想去东西冲穿越，然后约了朋友，周六果断去了。</p>
 
-<p>再现：demo代码如下</p>
+<h2 id="section">路线</h2>
 
-<pre><code>window.onload = function () {
-	var canvas = document.getElementById('canvas1');
-	var ctx = canvas.getContext("2d");
-	var width, height;
-	width = 320;
-	height = 568;
+<p>我们是先坐地铁到竹子林，然后到福田交通枢纽公交站（就在地铁站旁边）坐H92公交车到大鹏。因为是首发站，所以车上会有很多位置。刷深圳通是11块，如果给钱的话是13块。</p>
 
-	canvas.style.width = width+'px';
-	canvas.style.height = height + 'px';
-	canvas.width = width; 
-	canvas.height = height;
-	var img = new Image();
-	img.src = "../img/s6_1.png";
-	img.onload = function () {  
-	    ctx.drawImage(img, 20, 20, img.width/2, img.height/2); 
-	}  
-}();
-</code></pre>
+<p>到大鹏途中大概要两个小时左右，到了大鹏，可以选择去东冲还是去西冲。去西冲有1号线和2号线两个入口。我们是下了H92再坐232小巴到西冲的2号线。</p>
 
-<p>先看效果图（左边为电脑模拟，右边为手机）：</p>
+<p>到了西冲，入口每个人要收13块。继续走就到了西冲的沙滩边，然后往左边就是去东冲的方向了。</p>
 
-<p><img src="/images/2015/20150706canvas/1_pc.png" alt="电脑" />
-<img src="/images/2015/20150706canvas/2_phone.jpg" alt="手机" /></p>
+<p>到了东冲可以坐231小巴回大鹏。</p>
 
-<p>有没有发现什么？认真看就会发现：右边的图比较模糊（如果实在没发现请自戳双目，为什么？因为留着没用）。</p>
+<h2 id="section-1">物品</h2>
 
-<p>所以现在问题是：<code>为什么canvas加载图片在手机上会显示模糊？</code></p>
+<p>首先长袖，长裤，帽子什么的都是很有必要的！很有必要！很有必要！可以适当涂点防晒霜（因为我穿短袖短裤，没有帽子，然后裸露的皮肤全都晒伤了，红通通的，一摸就疼，哭）。防晒一定要做好！</p>
 
-<p>首先我们看看上面的代码：</p>
+<p>然后我们还买了手套，事实证明手套也是很有必要的，因为你要不断的攀岩啊（不骗人）。一副好的手套可以让穿越过程的难度降低30%左右～</p>
 
-<pre><code>canvas.style.width = width+'px';
-canvas.style.height = height + 'px';
-canvas.width = width; 
-canvas.height = height;
-</code></pre>
+<p>其他最重要的是水，因为穿越途中是没有水买的。我们三个人，买了两瓶大的和三瓶小的矿泉水，差不多喝完。其他吃的可以自己看心情选购，有一点是：在穿越过程中是不想吃东西的，最好在启程的时候就吃掉。</p>
 
-<p>这样子写是不是有点多此一举了？闲的蛋疼？为了证明不是蛋疼，首先我们要了解<code>设备像素</code>和<code>CSS像素</code>。</p>
+<h2 id="section-2">时间</h2>
 
-<h3 id="css">设备像素和CSS像素</h3>
+<p>我们是12点12分从西冲开始出发（正是最晒的时候），到东冲的时候，是下午4点19分。历时4个小时零7分，算是比较正常的时间吧。</p>
 
-<p>设备像素就是我们平时所说的设备真实像素，像iPhone5s的 640 x 1136。但一般开发者是不怎么关心这个数值的，因为有CSS像素。</p>
+<h1 id="section-3">看图时刻</h1>
 
-<p>CSS像素是我们平时代码直接用的，iPhone5s的CSS像素为 320 x 568（这样子应该懂了吧）。</p>
+<p>由于是用手机拍的，图片质量不是很好。</p>
 
-<p>由于设备像素和CSS像素不一样，所以设备会用几个设备像素表示一个CSS像素。像iPhone5s就是4个设备像素点表示一个CSS像素。如图：</p>
+<h4 id="section-4">西冲</h4>
+<p><img src="/images/2015/20150919cross/1.jpg" alt="" /></p>
 
-<p><img src="/images/2015/20150706canvas/3_px.gif" alt="像素比例" /></p>
+<p><img src="/images/2015/20150919cross/2.jpg" alt="" /></p>
 
-<p>这里就有一个很常见的问题：为什么图片在retina屏中会模糊？</p>
+<p><img src="/images/2015/20150919cross/3.jpg" alt="" /></p>
 
-<p>例如要显示 100px x 100px 的图片，如果切出来的图片也是 100px x 100px，那么在iPhone5s下是肯定会模糊的。
-因为iPhone5s的 设备像素/CSS像素 比是2。所以它需要的图片实际大小为 200px x 200px。如果像现在这样大小不够呢？那像素点只能被扩充了。</p>
+<p><img src="/images/2015/20150919cross/4.jpg" alt="" /></p>
 
-<p>什么是扩充？就是5s的4个设备像素点表示1个CSS像素点时候，本应该4个像素点都有各自的颜色的，但图片小了，那4个设备像素点都是复制成同一种颜色。十分简单粗暴的方法。</p>
+<h4 id="section-5">往东冲的方向</h4>
+<p><img src="/images/2015/20150919cross/5.jpg" alt="" /></p>
 
-<p><code>canvas的显示也是类似于图片，如果不够大就会被扩充。</code></p>
+<h4 id="section-6">开始</h4>
+<p><img src="/images/2015/20150919cross/6.jpg" alt="" /></p>
 
-<p><code>canvas.width/height</code> 表示的是设备像素，而 <code>canvas.style.width/height</code> 表示的是CSS像素。所以设置<code>canvas.width/height==canvas.style.width/height</code>的时候，如果 设备像素/CSS像素 不是1，canvas就被扩充了，然后图片加载进去，虽然是2倍实际大小，但还是模糊掉了（这里没想通？再想想）。这样就很好解析刚刚的例子在电脑端没有模糊（我的电脑像素比是1），但在手机端却模糊了（还不明白？不是我的问题就是你的问题了）。</p>
+<p><img src="/images/2015/20150919cross/7.jpg" alt="" /></p>
 
-<h3 id="section">解决方法</h3>
+<p><img src="/images/2015/20150919cross/8.jpg" alt="" /></p>
 
-<p>既然问题出现了，总是会有解决方法的。先看两个参数 <code>devicePixelRatio</code>和<code>webkitBackingStorePixelRatio</code>。</p>
+<h4 id="section-7">第一个小山头</h4>
+<p><img src="/images/2015/20150919cross/9.jpg" alt="" /></p>
 
-<h4 id="devicepixelratio">devicePixelRatio</h4>
+<p><img src="/images/2015/20150919cross/10.jpg" alt="" /></p>
 
-<p>devicePixelRatio是window下的属性，是 设备像素/CSS像素 的比值。下面列出了一些：</p>
+<h4 id="section-8">在休息</h4>
+<p><img src="/images/2015/20150919cross/11.jpg" alt="" /></p>
 
-<ul>
-  <li>iPhone5s 		2</li>
-  <li>iPhone6 plus  3</li>
-  <li>nexus7 		1.3 (非常奇葩)</li>
-</ul>
+<h4 id="section-9">另外一个很陡的小山头</h4>
+<p><img src="/images/2015/20150919cross/12.jpg" alt="" /></p>
 
-<p>这个参数比较简单直观，不用多说。其实在chrome模拟手机浏览的时候，也有这个参数的，如图：</p>
+<p><img src="/images/2015/20150919cross/13.jpg" alt="" /></p>
 
-<p><img src="/images/2015/20150706canvas/4_pc_px.png" alt="chrome模拟像素比" /></p>
+<h4 id="section-10">又一个小山头</h4>
+<p><img src="/images/2015/20150919cross/14.jpg" alt="" /></p>
 
-<p>上图中红色框中的就是这个像素比。</p>
+<h4 id="section-11">后面的山</h4>
+<p><img src="/images/2015/20150919cross/15.jpg" alt="" /></p>
 
-<h4 id="webkitbackingstorepixelratio">webkitBackingStorePixelRatio</h4>
+<p><img src="/images/2015/20150919cross/16.jpg" alt="" /></p>
 
-<p>webkitBackingStorePixelRatio是存在canvas context中（仅safari和chrome），该属性的值决定了浏览器在渲染canvas之前会用几个像素来存储画布信息。
-例如，在iOS6 safari中这个值为2，它要渲染 100px x 100px 的图片，首先会在内存中生成一张200x200的图片，然后浏览器渲染的时候，会按100x100的图片来渲染，
-因此就变成了200x200，正好和内存中的图片大小一致，因此在iOS的safari中不会出现失真的问题（有点绕口，慢慢理解）。</p>
+<h4 id="section-12">全景</h4>
+<p><img src="/images/2015/20150919cross/17.jpg" alt="" /></p>
 
-<p>但是在iOS7 的safari中这个值又变成了1，是出于性能的考虑，详情可以看<a href="http://asciiwwdc.com/2013/sessions/600">这里</a>，搜索关键字‘backing’。</p>
+<p><img src="/images/2015/20150919cross/19.jpg" alt="" /></p>
 
-<p>知道了这俩个参数，那接下来怎么玩？实践是检验真理的唯一标准。</p>
+<h4 id="section-13">从上面滚着下来</h4>
+<p><img src="/images/2015/20150919cross/20.jpg" alt="" /></p>
 
-<h3 id="section-1">实践</h3>
+<h4 id="section-14">地面时刻</h4>
+<p><img src="/images/2015/20150919cross/21.jpg" alt="" /></p>
 
-<p>修改之前的代码，把像素比加进去：</p>
+<h4 id="section-15">好想游泳</h4>
+<p><img src="/images/2015/20150919cross/22.jpg" alt="" /></p>
 
-<pre><code>var PIXEL_RATIO = (function () {
-    var ctx = document.createElement("canvas").getContext("2d"),
-        dpr = window.devicePixelRatio || 1,
-        bsr = ctx.webkitBackingStorePixelRatio ||
-              ctx.mozBackingStorePixelRatio ||
-              ctx.msBackingStorePixelRatio ||
-              ctx.oBackingStorePixelRatio ||
-              ctx.backingStorePixelRatio || 1;
+<h4 id="section-16">全景2</h4>
+<p><img src="/images/2015/20150919cross/23.jpg" alt="" /></p>
 
-    return dpr / bsr;
-})();
+<h4 id="section-17">回望</h4>
+<p><img src="/images/2015/20150919cross/24.jpg" alt="" /></p>
 
-window.onload = function () {
-	var canvas = document.getElementById('canvas1');
-	var ctx = canvas.getContext("2d");
-	var width, height;
-	width = 320;
-	height = 568;
+<h4 id="section-18">过不去了</h4>
+<p><img src="/images/2015/20150919cross/25.jpg" alt="" /></p>
 
-	canvas.style.width = width+'px';
-	canvas.style.height = height + 'px';
-	canvas.width = width * PIXEL_RATIO; 
-	canvas.height = height * PIXEL_RATIO;
-	var img = new Image();
-	img.src = "../img/s6_1.png";
-	img.onload = function () {  
-	    ctx.drawImage(img, 20, 20, img.width/2, img.height/2); 
-	}  
-}();
-</code></pre>
+<h4 id="section-19">回望</h4>
+<p><img src="/images/2015/20150919cross/26.jpg" alt="" /></p>
 
-<p>看看效果（左边为之前效果，右边为修改后效果）：</p>
+<h4 id="section-20">山顶</h4>
+<p><img src="/images/2015/20150919cross/27.jpg" alt="" /></p>
 
-<p><img src="/images/2015/20150706canvas/1_pc.png" alt="之前" />
-<img src="/images/2015/20150706canvas/5_pc.png" alt="之后" /></p>
+<p><img src="/images/2015/20150919cross/28.jpg" alt="" /></p>
 
-<p>发现了什么？图居然缩小了！我滴天，这是为什么？认真想想问题出在哪里。</p>
+<p><img src="/images/2015/20150919cross/29.jpg" alt="" /></p>
 
-<p><code>因为CSS像素点被缩放了</code>，为什么会缩放？因为它是大爷，它想缩所以缩了。</p>
+<h4 id="section-21">大海</h4>
+<p><img src="/images/2015/20150919cross/30.jpg" alt="" /></p>
 
-<p>所以解决方案是对canvas进行缩放，下面是完整版代码：</p>
+<h4 id="section-22">终点–东冲</h4>
+<p><img src="/images/2015/20150919cross/31.jpg" alt="" /></p>
 
-<pre><code>var PIXEL_RATIO = (function () {
-	    var ctx = document.createElement("canvas").getContext("2d"),
-	        dpr = window.devicePixelRatio || 1,
-	        bsr = ctx.webkitBackingStorePixelRatio ||
-	              ctx.mozBackingStorePixelRatio ||
-	              ctx.msBackingStorePixelRatio ||
-	              ctx.oBackingStorePixelRatio ||
-	              ctx.backingStorePixelRatio || 1;
+<h2 id="section-23">总结</h2>
 
-	    return dpr / bsr;
-})();
+<p>如果让有经验的人带一下会安全很多，一个人走会比较危险。整个过程还是刺激又好玩的，比爬山好玩多了，但没爬山安全踏实。时间要安排好，不然走到中间天黑了就麻烦了。周末会比较多人，大部分都是从东冲到西冲。跟着大部队的话不会走上歪路。</p>
 
-window.onload = function () {
-	var canvas = document.getElementById('canvas1');
-	var ctx = canvas.getContext("2d");
-	var width, height;
-	width = 320;
-	height = 568;
-
-	canvas.style.width = width+'px';
-	canvas.style.height = height + 'px';
-	canvas.width = width * PIXEL_RATIO; 
-	canvas.height = height * PIXEL_RATIO;
-
-	ctx.scale(PIXEL_RATIO, PIXEL_RATIO);
-
-	var img = new Image();
-	img.src = "../img/s6_1.png";
-	img.onload = function () {  
-	    ctx.drawImage(img, 20, 20); 
-	}  
-}();
-</code></pre>
-
-<p>左边是电脑之前模拟的效果，右边是电脑现在模拟的效果：</p>
-
-<p><img src="/images/2015/20150706canvas/1_pc.png" alt="之前电脑" />
-<img src="/images/2015/20150706canvas/7_pc.png" alt="之后电脑" /></p>
-
-<p>左边是手机之前的效果，右边是手机现在的效果：</p>
-
-<p><img src="/images/2015/20150706canvas/2_phone.jpg" alt="之前手机" />
-<img src="/images/2015/20150706canvas/8_ph.jpg" alt="之后手机" /></p>
-
-<p>嗯，基本的解决方案就是这样。如果有问题，可以提出来～</p>
-
-<p>参考：</p>
-
-<ul>
-  <li><a href="http://blog.csdn.net/laijingyao881201/article/details/39505043">http://blog.csdn.net/laijingyao881201/article/details/39505043</a></li>
-  <li><a href="http://www.html5rocks.com/en/tutorials/canvas/hidpi/">http://www.html5rocks.com/en/tutorials/canvas/hidpi/</a></li>
-</ul>
+<p>恩，刺激，好玩。</p>
 
 
       <ul class="pager">

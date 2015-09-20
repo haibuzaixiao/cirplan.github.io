@@ -8,6 +8,7 @@ jeffdeng.me/rss.xml
 jeffdeng.me/sitemap.txt
 jeffdeng.me/tags.html
 
+jeffdeng.me/trip/2015/09/19/cross
 jeffdeng.me/js/2015/07/06/canvas-resolution
 jeffdeng.me/plan/2015/01/08/plan
 jeffdeng.me/plan/2015/01/04/year-review
