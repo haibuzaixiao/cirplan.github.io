@@ -1,8 +1,8 @@
 ---
 layout: post
-category : nodejs
+category : Nodejs
 title: express的诡异错误
-tags : [nodejs, express, ejs, compass]
+tags : [Nodejs, Express, Ejs, Compass]
 ---
 {% include JB/setup %}
 

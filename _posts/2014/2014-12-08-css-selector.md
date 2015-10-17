@@ -1,6 +1,6 @@
 ---
 layout: post
-category : css
+category : CSS
 title: 译.css选择器渲染优化
 tags : [css, 翻译]
 ---

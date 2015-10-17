@@ -1,6 +1,6 @@
 ---
 layout: post
-category : plan
+category : Plan
 title: 2014年回顾
 tags : [2014, plan]
 ---

@@ -1,6 +1,6 @@
 ---
 layout: post
-category : css
+category : CSS
 title: 译.层叠和选择器的明确度--权重
 tags : [css,web,翻译]
 ---

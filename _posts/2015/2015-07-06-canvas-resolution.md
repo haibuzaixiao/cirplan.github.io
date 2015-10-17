@@ -1,6 +1,6 @@
 ---
 layout: post
-category : js
+category : Js
 title: canvas分辨率问题
 tags : [js, canvas]
 ---

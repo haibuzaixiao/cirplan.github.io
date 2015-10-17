@@ -1,6 +1,6 @@
 ---
 layout: post
-category : css
+category : CSS
 title: 译.css性能
 tags : [css, 翻译]
 ---

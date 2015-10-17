@@ -1,6 +1,6 @@
 ---
 layout: post
-category : java
+category : JAVA
 title: java的urlrewritefilter简单使用
 tags : [java, urlrewrite]
 ---
