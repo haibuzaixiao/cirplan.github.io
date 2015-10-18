@@ -8,6 +8,9 @@ jeffdeng.me/rss.xml
 jeffdeng.me/sitemap.txt
 jeffdeng.me/tags.html
 
+jeffdeng.me/js/2015/10/19/js-requirejs
+jeffdeng.me/js/2015/10/18/js-amd-cmd
+jeffdeng.me/js/2015/10/17/js-module
 jeffdeng.me/trip/2015/09/19/cross
 jeffdeng.me/js/2015/07/06/canvas-resolution
 jeffdeng.me/plan/2015/01/08/plan

@@ -4,13 +4,692 @@
  <title>萝拔</title>
  <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2015-10-17T14:37:58+08:00</updated>
+ <updated>2015-10-19T01:12:34+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
    <email>dcirplan@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>JS模块化开发（3）：require.js的使用以及压缩策略</title>
+   <link href="jeffdeng.me/js/2015/10/19/js-requirejs"/>
+   <updated>2015-10-19T00:00:00+08:00</updated>
+   <id>jeffdeng.me/js/2015/10/19/js-requirejs</id>
+   <content type="html">
+&lt;p&gt;&lt;a href=&quot;http://requirejs.org/&quot;&gt;require.js&lt;/a&gt;是遵循AMD规范的模块加载器，这里简单说说其用法和压缩策略。&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;本文内容：&lt;/h2&gt;
+
+&lt;p&gt;1.基本使用&lt;/p&gt;
+
+&lt;p&gt;2.如何打包压缩&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;基本使用&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;1.1 加载&lt;/h3&gt;
+
+&lt;p&gt;要使用require.js前提当然是先下载好或引入CDN。若下载好后，直接引入：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;script data-main=&quot;index&quot; src=&quot;/js/require.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里表示引入require.js后，把index.js作为程序的主模块，加载并执行。如果怕页面阻塞，可以把这段代码放到页面底部。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;1.2 定义主模块&lt;/h3&gt;
+
+&lt;p&gt;定义主模块可以使用&lt;code&gt;require&lt;/code&gt;：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// main.js
+require([&#39;moduleA&#39;, &#39;moduleB&#39;, &#39;moduleC&#39;], function (moduleA, moduleB, moduleC){
+    // some code here
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;也可以使用常规的定义模块的方式，用&lt;code&gt;define&lt;/code&gt;定义，因为&lt;code&gt;data-main&lt;/code&gt;已经指定这个是主模块了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// main.js
+define([&#39;moduleA&#39;, &#39;moduleB&#39;, &#39;moduleC&#39;], function (moduleA, moduleB, moduleC){
+    // some code here
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但有一种情况是一定要使用&lt;code&gt;require&lt;/code&gt;定义的，下面会说到。&lt;/p&gt;
+
+&lt;h3 id=&quot;requirejs&quot;&gt;1.3 require.js配置&lt;/h3&gt;
+
+&lt;p&gt;利用&lt;code&gt;require.config()&lt;/code&gt;，对require.js进行基本配置，&lt;code&gt;require.config()&lt;/code&gt;要放在主模块的头部，主要作用如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;定义基本目录；&lt;/li&gt;
+  &lt;li&gt;对常用模块定义别名，方便引用；&lt;/li&gt;
+  &lt;li&gt;定义文件版本号；&lt;/li&gt;
+  &lt;li&gt;处理非AMD规范的模块；&lt;/li&gt;
+  &lt;li&gt;处理非AMD规范并对其他模块产生依赖的模块；&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面我们看例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// require.js config
+require.config({
+    baseUrl: &#39;/common/js&#39;, // 定义基本目录
+    urlArgs: &#39;v=1.1.0&#39;,  // 定义请求js文件版本号
+    paths: { // 常用模块别名
+        &#39;angular&#39;    : &#39;lib/angular.min&#39;,
+        &#39;sanitize&#39;   : &#39;lib/angular-sanitize.min&#39;,
+        &#39;zepto&#39;      : &#39;lib/zepto.min&#39;
+    },
+
+    // 若加载模块不符合AMD规范，直接返回全局变量，则用下面方式封装
+    // 切记：exports的变量一定要和返回的 全局变量名称 一致
+    shim: {
+        &#39;angular&#39;: {
+	        exports: &#39;angular&#39;
+        },
+        &#39;sanitize&#39;: { // 对非AMD规范，对其他模块产生依赖依赖的要加上
+	        deps: [&#39;angular&#39;],
+	        exports: &#39;Sanitize&#39;
+         },
+        &#39;zepto&#39;: {
+	       exports: &#39;Zepto&#39;
+       }
+    }
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面这个就是一个很常规的require.config配置。但在实际开发中，我们是不会把这段配置加在每个主模块的头部的，不然要修改点东西，就要一个一个改，岂不是要死的心都有。&lt;/p&gt;
+
+&lt;p&gt;一般把上面的配置信息提成一个公共js，在require.js加载前加载。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;script src=&quot;/js/config.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script data-main=&quot;index/index&quot; src=&quot;/js/require.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但如果直接把上面这段配置放在&lt;code&gt;config.js&lt;/code&gt;里会报&lt;code&gt;require is undefined&lt;/code&gt;。想想也是，require.js都还没有加载。所以我们修改下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// require.js config
+var require = {
+    baseUrl: &#39;/common/js&#39;, // 定义基本目录
+    urlArgs: &#39;v=1.1.0&#39;,  // 定义请求js文件版本号
+    paths: { // 常用模块别名
+        &#39;angular&#39;    : &#39;lib/angular.min&#39;,
+        &#39;sanitize&#39;   : &#39;lib/angular-sanitize.min&#39;,
+        &#39;zepto&#39;      : &#39;lib/zepto.min&#39;
+    },
+
+    // 若加载模块不符合AMD规范，直接返回全局变量，则用下面方式封装
+    // 切记：exports的变量一定要和返回的 全局变量名称 一致
+    shim: {
+        &#39;angular&#39;: {
+	        exports: &#39;angular&#39;
+        },
+        &#39;sanitize&#39;: { // 对非AMD规范，对其他模块产生依赖依赖的要加上
+	        deps: [&#39;angular&#39;],
+	        exports: &#39;Sanitize&#39;
+         },
+        &#39;zepto&#39;: {
+	       exports: &#39;Zepto&#39;
+       }
+    }
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样就ok啦，现在可以想怎么折腾就怎么折腾了。&lt;/p&gt;
+
+&lt;h3 id=&quot;amd&quot;&gt;1.4 AMD模块写法&lt;/h3&gt;
+
+&lt;p&gt;关于AMD模块的定义，上一篇有介绍。直接定义在&lt;code&gt;define&lt;/code&gt;函数中。如我们要定义url模块：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// url.js
+define(function (){
+　　var getId = function (key) {
+	    ...
+    };
+
+　　return {
+       getId: getId
+　　};
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;使用方法如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// main.js
+require([&#39;url&#39;], function (url){
+　　alert(url.getId(&#39;index&#39;));
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;若定义有依赖的模块：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define([&#39;util&#39;], function(util){
+    function each(){
+        util.doSomething();
+        ...
+    }
+    return {
+       each : each
+    };
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;section-4&quot;&gt;2.如何打包压缩&lt;/h2&gt;
+
+&lt;p&gt;由于使用模块化，文件会被分成很多个，这样在浏览器端无疑会产生很多HTTP请求，会让用户的等待时间加长。对于这个问题，require.js也提出了用&lt;code&gt;r.js&lt;/code&gt;合并压缩的方案。&lt;/p&gt;
+
+&lt;p&gt;未完待续…&lt;/p&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>JS模块化开发（2）：AMD与CMD规范</title>
+   <link href="jeffdeng.me/js/2015/10/18/js-amd-cmd"/>
+   <updated>2015-10-18T00:00:00+08:00</updated>
+   <id>jeffdeng.me/js/2015/10/18/js-amd-cmd</id>
+   <content type="html">
+&lt;p&gt;接着&lt;a href=&quot;/js/2015/10/17/js-module/&quot;&gt;上一篇&lt;/a&gt;，这里说下AMD与CMD规范。&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;本文内容：&lt;/h2&gt;
+
+&lt;p&gt;1.AMD规范&lt;/p&gt;
+
+&lt;p&gt;2.CMD规范&lt;/p&gt;
+
+&lt;p&gt;3.AMD规范CMD规范的异同点&lt;/p&gt;
+
+&lt;h2 id=&quot;amdrequirejs&quot;&gt;1.AMD规范（代表require.js）&lt;/h2&gt;
+
+&lt;p&gt;AMD规范的英文文档看&lt;a href=&quot;https://github.com/amdjs/amdjs-api/wiki/AMD&quot;&gt;这里&lt;/a&gt;，中文版看&lt;a href=&quot;https://github.com/amdjs/amdjs-api/wiki/AMD-(%E4%B8%AD%E6%96%87%E7%89%88)&quot;&gt;这里&lt;/a&gt;（选择细看文档的话，下面不用看了）。AMD全称是Asynchronous Module Definition（异步模块定义规范），规定了模块与模块之间是异步加载的，
+这和浏览器的异步加载模块的环境刚好适应（浏览器同步加载模块会导致性能、可用性、调试和跨域访问等问题）。&lt;/p&gt;
+
+&lt;p&gt;该规范只定义了一个全局函数：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(id?, dependencies?, factory);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;id-&quot;&gt;id 名字&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;类型：字符串；&lt;/li&gt;
+  &lt;li&gt;特点：唯一，可选，默认为脚本名字。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;dependencies-&quot;&gt;dependencies 依赖&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;类型：数组；&lt;/li&gt;
+  &lt;li&gt;执行顺序：依赖模块必须根据模块的工厂方法优先级执行（依赖少的先执行），并且执行的结果应该按照依赖数组中的位置顺序以参数的形式传入（定义中模块的）工厂方法中；&lt;/li&gt;
+  &lt;li&gt;模块命名：如果是相对的，应该解析为相对定义中的模块。&lt;/li&gt;
+  &lt;li&gt;关键字： 三种特殊的依赖关键字&lt;code&gt;require&lt;/code&gt;,&lt;code&gt;exports&lt;/code&gt;, &lt;code&gt;module&lt;/code&gt;，是可选的，如果忽略此参数，它应该默认为[“require”, “exports”, “module”]。
+然而，如果工厂方法的形参个数小于3，加载器会选择以函数指定的参数个数调用工厂方法。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;创建一个名为”alpha”的模块，使用了require，exports，和名为”beta”的模块:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(&quot;alpha&quot;, [&quot;require&quot;, &quot;exports&quot;, &quot;beta&quot;], function (require, exports, beta) {
+   exports.verb = function() {
+       return beta.verb();
+       //Or:
+       return require(&quot;beta&quot;).verb();
+   }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;factory-&quot;&gt;factory 工厂方法&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;类型：函数或对象；&lt;/li&gt;
+  &lt;li&gt;特点：函数只执行一次&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;一个没有依赖性的模块可以直接定义对象：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define({
+  add: function(x, y){
+    return x + y;
+  }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;commonjs-&quot;&gt;简单的 CommonJS 转换&lt;/h3&gt;
+
+&lt;p&gt;为了向CommonJS靠拢而加的方法。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(function (require, exports, module) {
+ var a = require(&#39;a&#39;),
+     b = require(&#39;b&#39;);
+
+ exports.action = function () {};
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但这会被转换成规范模式再执行：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define([&quot;a&quot;, &quot;b&quot;], function (a, b) {
+  	...
+    exports.action = function () {};
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在require.js（v2.1.20 line2052）中的实现如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//If no name, and callback is a function, then figure out if it a
+//CommonJS thing with dependencies.
+if (!deps &amp;amp;&amp;amp; isFunction(callback)) {
+    deps = [];
+    //Remove comments from the callback string,
+    //look for require calls, and pull them into the dependencies,
+    //but only if there are function args.
+    if (callback.length) {
+        callback
+            .toString()
+            .replace(commentRegExp, &#39;&#39;)
+            .replace(cjsRequireRegExp, function (match, dep) {
+                deps.push(dep);
+            });
+
+        //May be a CommonJS thing even without require calls, but still
+        //could use exports, and module. Avoid doing exports and module
+        //work though if it just needs require.
+        //REQUIRES the function to expect the CommonJS variables in the
+        //order listed below.
+        deps = (callback.length === 1 ? [&#39;require&#39;] : [&#39;require&#39;, &#39;exports&#39;, &#39;module&#39;]).concat(deps);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但在某些情况下，因为脚本大小的限制或函数不支持toString方法（Opera Mobile是已知的不支持函数的toString方法），模块加载器可以选择扫描不扫描依赖性。
+如果有依赖参数，模块加载器不应该在工厂方法中扫描依赖性。&lt;/p&gt;
+
+&lt;h2 id=&quot;cmdseajs&quot;&gt;2.CMD规范（代表sea.js）&lt;/h2&gt;
+
+&lt;p&gt;CMD(Common Module Definition)规范戳&lt;a href=&quot;https://github.com/seajs/seajs/issues/242&quot;&gt;这里&lt;/a&gt;。该规范规定一个模块就是一个文件，定义的函数如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(factory);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;define是全局函数；&lt;/li&gt;
+  &lt;li&gt;factory可以是一个函数，也可以是一个对象或字符串；&lt;/li&gt;
+  &lt;li&gt;factory为函数时，默认传入三个参数：&lt;code&gt;require&lt;/code&gt;、&lt;code&gt;exports&lt;/code&gt; 和 &lt;code&gt;module&lt;/code&gt;;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ex:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(function(require, exports, module) {
+  // 模块代码
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;CMD也支持如下写法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(id?, deps?, factory)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;字符串 id 表示模块标识，数组 deps 是模块依赖。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(&#39;hello&#39;, [&#39;jquery&#39;], function(require, exports, module) {
+  // 模块代码
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但是，带 id 和 deps 参数的 define 用法不属于 CMD 规范，而属于 &lt;a href=&quot;https://github.com/cmdjs/specification/blob/master/draft/transport.md&quot;&gt;Modules/Transport&lt;/a&gt; 规范。&lt;/p&gt;
+
+&lt;p&gt;下面分别说说&lt;code&gt;require&lt;/code&gt;，&lt;code&gt;exports&lt;/code&gt;，&lt;code&gt;module&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;require&quot;&gt;require&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;require&lt;/code&gt;是 factory 函数的第一个参数，接受 模块标识 作为唯一参数，用来获取其他模块提供的接口。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(function(require, exports) {
+
+  // 获取模块 a 的接口
+  var a = require(&#39;./a&#39;);
+
+  // 调用模块 a 的方法
+  a.doSomething();
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;require.async&lt;/code&gt; require.async(id, callback?) 方法用来在模块内部异步加载模块，并在加载完成后执行指定回调。callback 参数可选。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(function(require, exports, module) {
+
+  // 异步加载一个模块，在加载完成时，执行回调
+  require.async(&#39;./b&#39;, function(b) {
+    b.doSomething();
+  });
+
+  // 异步加载多个模块，在加载完成时，执行回调
+  require.async([&#39;./c&#39;, &#39;./d&#39;], function(c, d) {
+    c.doSomething();
+    d.doSomething();
+  });
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;exports&quot;&gt;exports&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;exports&lt;/code&gt;是一个对象，用来向外提供模块接口。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(function(require, exports) {
+
+  // 对外提供 foo 属性
+  exports.foo = &#39;bar&#39;;
+
+  // 对外提供 doSomething 方法
+  exports.doSomething = function() {};
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;除了给 exports 对象增加成员，还可以使用 return 直接向外提供接口。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(function(require) {
+
+  // 通过 return 直接提供接口
+  return {
+    foo: &#39;bar&#39;,
+    doSomething: function() {}
+  };
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;提示：exports 仅仅是 module.exports 的一个引用。在 factory 内部给 exports 重新赋值时，并不会改变 module.exports 的值。因此给 exports 赋值是无效的，不能用来更改模块接口。&lt;/p&gt;
+
+&lt;h3 id=&quot;module&quot;&gt;module&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;module&lt;/code&gt; 是一个对象，上面存储了与当前模块相关联的一些属性和方法。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;module.exports&lt;/code&gt; 当前模块对外提供的接口。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define(function(require, exports, module) {
+
+  // exports 是 module.exports 的一个引用
+  console.log(module.exports === exports); // true
+
+  // 重新给 module.exports 赋值
+  module.exports = new SomeClass();
+
+  // exports 不再等于 module.exports
+  console.log(module.exports === exports); // false
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;注意：对 module.exports 的赋值需要同步执行，不能放在回调函数里。下面这样是不行的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// x.js
+define(function(require, exports, module) {
+
+  // 错误用法
+  setTimeout(function() {
+    module.exports = { a: &quot;hello&quot; };
+  }, 0);
+
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;CMD经常使用的 API 只有 &lt;code&gt;define, require, require.async, exports, module.exports&lt;/code&gt; 这五个。其他请看规范。&lt;/p&gt;
+
+&lt;h2 id=&quot;amdcmd&quot;&gt;3.AMD规范CMD规范的异同点&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;相同点&lt;/h3&gt;
+
+&lt;p&gt;AMD与CMD的相同点是：都是 &lt;strong&gt;异步提前加载&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// AMD 
+define([&#39;./a&#39;, &#39;./b&#39;], function(a, b) { 
+   //在此时模块a和b都已加载完
+});
+
+// CMD
+define(function(require, exports, module) {
+    //在此时模块a和b都已加载完
+    var a = require(&#39;./a&#39;); 
+    a.doSomething();
+	...
+
+    var b = require(&#39;./b&#39;);
+    b.doSomething();
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;不同点&lt;/h3&gt;
+
+&lt;p&gt;而两者的区别，在上一篇中的AMD和CommonJS的区别已经说了一部分。玉伯在&lt;a href=&quot;http://www.zhihu.com/question/20351507/answer/14859415&quot;&gt;知乎&lt;/a&gt;也有回答，或者看&lt;a href=&quot;https://github.com/seajs/seajs/issues/277&quot;&gt;这里&lt;/a&gt;。主要有俩个，一个是执行时机不同，还有一个是书写风格不同。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-3&quot;&gt;1.执行时机&lt;/h4&gt;
+
+&lt;p&gt;AMD是 &lt;strong&gt;提前执行&lt;/strong&gt;，CMD是 &lt;strong&gt;延迟执行&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// AMD 
+define([&#39;./a&#39;], function(a) { 
+    // 在这之前a已经执行完并返回
+    a.doSomething()；
+	...
+});
+
+// CMD
+define(function(require, exports, module) {
+    var a = require(&#39;./a&#39;); // 模块a在此时才执行
+    a.doSomething();
+	...
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;section-4&quot;&gt;2.书写风格&lt;/h4&gt;
+
+&lt;p&gt;CMD 推崇&lt;strong&gt;依赖就近&lt;/strong&gt;，AMD 推崇&lt;strong&gt;依赖前置&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// CMD
+define(function(require, exports, module) {
+    var a = require(&#39;./a&#39;);
+    a.doSomething();
+    // 此处略去 100 行
+    var b = require(&#39;./b&#39;); // 依赖可以就近书写
+    b.doSomething();
+    // ... 
+});
+
+// AMD 默认推荐的是
+define([&#39;./a&#39;, &#39;./b&#39;], function(a, b) { // 依赖必须一开始就写好
+    a.doSomething();
+    // 此处略去 100 行
+    b.doSomething();
+    ...
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;end&quot;&gt;End&lt;/h2&gt;
+
+&lt;p&gt;选择AMD还是CMD要看项目的需求和自己对写法的偏好，并没有绝对说哪个比哪个好。require.js成名较早，人气比较高。sea.js小而优雅，
+文档支持也比较好，国内还是有比较多人使用的。&lt;/p&gt;
+
+&lt;p&gt;下面介绍&lt;code&gt;require.js&lt;/code&gt;的使用，请看下一篇：&lt;a href=&quot;/js/2015/10/19/js-requirejs/&quot;&gt;require.js的使用以及压缩策略&lt;/a&gt;&lt;/p&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>JS模块化开发（1）：历史</title>
+   <link href="jeffdeng.me/js/2015/10/17/js-module"/>
+   <updated>2015-10-17T00:00:00+08:00</updated>
+   <id>jeffdeng.me/js/2015/10/17/js-module</id>
+   <content type="html">
+&lt;pre&gt;&lt;code&gt;开篇感言：一直以来懒散的很，以为想改就改，无须过于在意。但现在发现懒散的态度已经融到骨子里了，还能改否？曰：难。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;前言：&lt;/h3&gt;
+
+&lt;p&gt;JS模块化在现在早已不是一个新鲜的词语，随便在网络上搜一下都有一大堆文献资料，简单的、详细的应有尽有。
+而我最近才开始关注这方面，没有见证到09年以来COMMOMJS标准的诞生，AMD和CMD的崛起，未免是一个遗憾。
+所以这里整理下JS模块化的发展历程。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;本文内容：&lt;/h3&gt;
+
+&lt;p&gt;1.为什么需要模块化&lt;/p&gt;
+
+&lt;p&gt;2.模块化的发展历程&lt;/p&gt;
+
+&lt;p&gt;3.AMD和CommonJS的区别&lt;/p&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;1.为什么需要模块化&lt;/h3&gt;
+
+&lt;p&gt;为什么需要模块化，玉伯大大的这篇&lt;a href=&quot;https://github.com/seajs/seajs/issues/547&quot;&gt;前端模块化开发的价值&lt;/a&gt;应该很好解答你的疑问。
+文章中提到的两点：&lt;code&gt;命名冲突&lt;/code&gt;和&lt;code&gt;文件依赖&lt;/code&gt;问题的确是JS一直以来的痛处。由与JS是10天内诞生的，所以没有其他高大上编程语言尽善尽美的模块管理机制。
+但不管这是作者的刻意为之还是兼顾不到，从ES6的规范来看，模块化已经是大势所趋了。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-3&quot;&gt;1.1命名冲突&lt;/h4&gt;
+
+&lt;p&gt;JS是一门容错性很高的语言，定义变量不需要定义类型，对于重复的命名既不会报错也不会停止执行。看例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// 重复声明
+var a = 1;
+var a;
+console.log(a); // 1
+
+// 重复声明&amp;amp;赋值
+var a = 1;
+var a = 2;
+console.log(a); // 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面的例子很好理解，JS的变量是先声明再赋值的，所以对于重复声明是没有影响的。但重复赋值就会把之前的值覆盖掉。如果在团队开发中，我无心把你的覆盖了，
+你无意把我写的覆盖了，等合并代码后，觉得整个码生都是灰暗的。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-4&quot;&gt;1.2模块依赖&lt;/h4&gt;
+
+&lt;p&gt;模块依赖在项目不大，或者不算复杂的情况还不算什么问题。但当项目代码数量上来了，管理模块依赖简直要命。最古老的方法就是人肉依赖：什么？引入这个
+JS文件报错了？之前不是用的没问题吗？应该是出BUG了，看下谁写的，叫他来看看……如果你是作者对于这样的事情是不是觉得有点无奈，不由地感叹：时间都去哪了。
+当然，可以在JS文件的头注释上把要依赖的文件列出来。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-5&quot;&gt;1.3常规处理&lt;/h4&gt;
+
+&lt;p&gt;既然这俩个问题早就有了，那之前是怎么处理的呢？控制好作用域&amp;amp;采用自执行函数生成对象。参考阮一峰老师的&lt;a href=&quot;http://www.ruanyifeng.com/blog/2012/10/javascript_module.html&quot;&gt;Javascript模块化编程（一）：模块的写法&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;a.常规的对象生成方法：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var module1 = new Object({
+	_count : 0,
+
+	m1 : function (){
+	　　　//...
+	},
+
+	m2 : function (){
+	//...
+	}
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样在一定程度上减少变量的重复命名，调用直接 &lt;code&gt;module1.m1()&lt;/code&gt; 就可以了。但缺点也很明显，可以直接修改对象内部的属性，模块之间看不出关联。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;b.采用立即执行函数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var module1 = (function(){
+　　var _count = 0;
+　　var m1 = function(){
+　　　　//...
+　　};
+　　var m2 = function(){
+　　　　//...
+　　};
+　　return {
+　　　　m1 : m1,
+　　　　m2 : m2
+　　};
+})();
+console.info(module1._count); //undefined
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样对象内部属性就修改不了。但这样看不出模块之间的依赖。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;c.输入全局变量&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;显式地将其他变量输入模块，可以明确模块依赖。ex：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var module1 = (function ($, YAHOO) {
+　　//...
+})(jQuery, YAHOO);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在没有模块加载器的情况下，这样算是比较好的解决方案了。一方面限制了变量作用域，另外显示把依赖输入模块，一目了然。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-6&quot;&gt;2.模块化的发展历程&lt;/h3&gt;
+
+&lt;p&gt;参考玉伯的&lt;a href=&quot;https://github.com/seajs/seajs/issues/588&quot;&gt;前端模块化开发那点历史&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;在2009年，ServerJS诞生了，其社区推出&lt;a href=&quot;http://wiki.commonjs.org/wiki/Modules&quot;&gt;Modules/1.0&lt;/a&gt;规范，Node.js采用部分该规范并获得不错的效果。ex:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var a = require(&#39;./a&#39;)  // 加载模块（同步加载）
+a.doSomething()         // 等上一句执行完才会执行
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ServerJS为了把这套规范推到浏览器端，就改名叫做CommonJS，同时激烈争论Modules的下一版规范。分歧和冲突由此诞生，逐步形成了三大流派：&lt;/p&gt;
+
+&lt;p&gt;1.&lt;strong&gt;Modules/1.x&lt;/strong&gt; 流派。这个观点觉得 1.x 规范已经够用，只要移植到浏览器端就好。要做的是新增 &lt;a href=&quot;http://wiki.commonjs.org/wiki/Modules/Transport&quot;&gt;Modules/Transport&lt;/a&gt; 规范，即在浏览器上运行前，先通过转换工具将模块转换为符合 Transport 规范的代码。主流代表是服务端的开发人员。现在值得关注的有两个实现：越来越火的 &lt;a href=&quot;https://github.com/componentjs/component&quot;&gt;component&lt;/a&gt; 和走在前沿的 &lt;a href=&quot;https://github.com/esnext/es6-module-transpiler&quot;&gt;es6 module transpiler&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;2.&lt;strong&gt;Modules/Async&lt;/strong&gt; 流派。这个观点觉得浏览器有自身的特征，不应该直接用 Modules/1.x 规范。这个观点下的典型代表是 &lt;a href=&quot;http://wiki.commonjs.org/wiki/Modules/AsynchronousDefinition&quot;&gt;AMD&lt;/a&gt; 规范及其实现 &lt;a href=&quot;http://requirejs.org/&quot;&gt;RequireJS&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;3.&lt;strong&gt;Modules/2.0&lt;/strong&gt; 流派。这个观点觉得浏览器有自身的特征，不应该直接用 Modules/1.x 规范，但应该尽可能与 Modules/1.x 规范保持一致。这个观点下的典型代表是 &lt;a href=&quot;https://code.google.com/p/bravojs/&quot;&gt;BravoJS&lt;/a&gt; 和 FlyScript 的作者。BravoJS 作者对 CommonJS 的社区的贡献很大，这份 &lt;a href=&quot;http://www.page.ca/~wes/CommonJS/modules-2.0-7/&quot;&gt;Modules/2.0-draft&lt;/a&gt; 规范花了很多心思。FlyScript 的作者提出了 &lt;a href=&quot;http://wiki.commonjs.org/wiki/Modules/Wrappings&quot;&gt;Modules/Wrappings&lt;/a&gt; 规范，这规范是 CMD 规范的前身。可惜的是 BravoJS 太学院派，FlyScript 后来做了自我阉割，将整个网站（flyscript.org）下线了。&lt;/p&gt;
+
+&lt;h3 id=&quot;amdcommonjs&quot;&gt;3.AMD和CommonJS的区别&lt;/h3&gt;
+
+&lt;h4 id=&quot;section-7&quot;&gt;1.执行时机有区别&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;// Modules/1.0:
+var a = require(&quot;./a&quot;) // 执行到此时，a.js 才同步下载并执行
+
+// AMD:
+define([&quot;a&quot;], function(a) {
+  // 在这里，模块 a 已经下载并执行好
+  // ...
+
+})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;AMD 里提前下载 a.js 是浏览器的限制，没办法做到同步下载，这个社区都认可。但执行，AMD 里是 Early Executing，Modules/1.0 里是第一次 require 时才执行。这个差异很多人不能接受，包括持 Modules/2.0 观点的也不能接受。这个差异，也导致实质上 Node 的模块与 AMD 模块是无法共享的，存在潜在冲突。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-8&quot;&gt;2.模块书写风格有争议&lt;/h4&gt;
+
+&lt;p&gt;AMD 风格下，通过参数传入依赖模块，破坏了 &lt;strong&gt;就近声明&lt;/strong&gt; 原则。比如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;define([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;, &quot;f&quot;], function(a, b, c, d, e, f) {
+
+    // 等于在最前面申明并初始化了要用到的所有模块
+
+   if (false) {
+       // 即便压根儿没用到某个模块 b，但 b 还是提前执行了
+       b.foo()
+   }
+
+})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;还有就是 AMD 下 require 的用法，以及增加了全局变量 define 等细节，当时在社区被很多人不认可。&lt;/p&gt;
+
+&lt;p&gt;最后，AMD 从 CommonJS 社区独立了出去，单独成为了 AMD 社区。这样的结局不免的让人唏嘘不已。&lt;/p&gt;
+
+&lt;p&gt;下一篇：&lt;a href=&quot;/js/2015/10/18/js-amd-cmd/&quot;&gt;AMD与CMD的规范&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;参考：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/seajs/seajs/issues/547&quot;&gt;https://github.com/seajs/seajs/issues/547&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/seajs/seajs/issues/588&quot;&gt;https://github.com/seajs/seajs/issues/588&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://huangxuan.me/2015/05/25/js-module-loader/&quot;&gt;JavaScript Module Loader&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+</content>
+ </entry>
  
  <entry>
    <title>穿越东西冲</title>

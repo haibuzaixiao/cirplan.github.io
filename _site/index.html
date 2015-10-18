@@ -133,10 +133,10 @@
 <div class="row post">
   <div class="span11">
     <h1 class="title">
-      <a href="/trip/2015/09/19/cross" title="穿越东西冲">穿越东西冲</a> 
+      <a href="/js/2015/10/19/js-requirejs" title="JS模块化开发（3）：require.js的使用以及压缩策略">JS模块化开发（3）：require.js的使用以及压缩策略</a> 
       
     </h1>
-    <div class="date f-c-b">Date：<span>2015-09-19</span></div>
+    <div class="date f-c-b">Date：<span class="font-spcial">2015-10-19</span></div>
     
     <div class="tag-n">
       <span class="tag-tip">Tag:</span>
@@ -147,9 +147,11 @@
 
   
      
-    	<li><a href="/tags.html#徒步-ref">徒步 <span>1</span></a></li>
+    	<li><a href="/tags.html#js-ref">js <span>4</span></a></li>
      
-    	<li><a href="/tags.html#东西冲-ref">东西冲 <span>1</span></a></li>
+    	<li><a href="/tags.html#requirejs-ref">requirejs <span>1</span></a></li>
+     
+    	<li><a href="/tags.html#module-ref">module <span>3</span></a></li>
     
   
 
@@ -159,118 +161,169 @@
      
       </div>
       
-<p>周三的时候突然想去东西冲穿越，然后约了朋友，周六果断去了。</p>
+<p><a href="http://requirejs.org/">require.js</a>是遵循AMD规范的模块加载器，这里简单说说其用法和压缩策略。</p>
 
-<h2 id="section">路线</h2>
+<h2 id="section">本文内容：</h2>
 
-<p>我们是先坐地铁到竹子林，然后到福田交通枢纽公交站（就在地铁站旁边）坐H92公交车到大鹏。因为是首发站，所以车上会有很多位置。刷深圳通是11块，如果给钱的话是13块。</p>
+<p>1.基本使用</p>
 
-<p>到大鹏途中大概要两个小时左右，到了大鹏，可以选择去东冲还是去西冲。去西冲有1号线和2号线两个入口。我们是下了H92再坐232小巴到西冲的2号线。</p>
+<p>2.如何打包压缩</p>
 
-<p>到了西冲，入口每个人要收13块。继续走就到了西冲的沙滩边，然后往左边就是去东冲的方向了。</p>
+<h2 id="section-1">基本使用</h2>
 
-<p>到了东冲可以坐231小巴回大鹏。</p>
+<h3 id="section-2">1.1 加载</h3>
 
-<h2 id="section-1">物品</h2>
+<p>要使用require.js前提当然是先下载好或引入CDN。若下载好后，直接引入：</p>
 
-<p>首先长袖，长裤，帽子什么的都是很有必要的！很有必要！很有必要！可以适当涂点防晒霜（因为我穿短袖短裤，没有帽子，然后裸露的皮肤全都晒伤了，红通通的，一摸就疼，哭）。防晒一定要做好！</p>
+<pre><code>&lt;script data-main="index" src="/js/require.js"&gt;&lt;/script&gt;
+</code></pre>
 
-<p>然后我们还买了手套，事实证明手套也是很有必要的，因为你要不断的攀岩啊（不骗人）。一副好的手套可以让穿越过程的难度降低30%左右～</p>
+<p>这里表示引入require.js后，把index.js作为程序的主模块，加载并执行。如果怕页面阻塞，可以把这段代码放到页面底部。</p>
 
-<p>其他最重要的是水，因为穿越途中是没有水买的。我们三个人，买了两瓶大的和三瓶小的矿泉水，差不多喝完。其他吃的可以自己看心情选购，有一点是：在穿越过程中是不想吃东西的，最好在启程的时候就吃掉。</p>
+<h3 id="section-3">1.2 定义主模块</h3>
 
-<h2 id="section-2">时间</h2>
+<p>定义主模块可以使用<code>require</code>：</p>
 
-<p>我们是12点12分从西冲开始出发（正是最晒的时候），到东冲的时候，是下午4点19分。历时4个小时零7分，算是比较正常的时间吧。</p>
+<pre><code>// main.js
+require(['moduleA', 'moduleB', 'moduleC'], function (moduleA, moduleB, moduleC){
+    // some code here
+});
+</code></pre>
 
-<h1 id="section-3">看图时刻</h1>
+<p>也可以使用常规的定义模块的方式，用<code>define</code>定义，因为<code>data-main</code>已经指定这个是主模块了：</p>
 
-<p>由于是用手机拍的，图片质量不是很好（没错，我还压缩了）。</p>
+<pre><code>// main.js
+define(['moduleA', 'moduleB', 'moduleC'], function (moduleA, moduleB, moduleC){
+    // some code here
+});
+</code></pre>
 
-<h4 id="section-4">西冲</h4>
-<p><img src="/images/2015/20150919cross/1.jpg" alt="" /></p>
+<p>但有一种情况是一定要使用<code>require</code>定义的，下面会说到。</p>
 
-<p><img src="/images/2015/20150919cross/2.jpg" alt="" /></p>
+<h3 id="requirejs">1.3 require.js配置</h3>
 
-<p><img src="/images/2015/20150919cross/3.jpg" alt="" /></p>
+<p>利用<code>require.config()</code>，对require.js进行基本配置，<code>require.config()</code>要放在主模块的头部，主要作用如下：</p>
 
-<p><img src="/images/2015/20150919cross/4.jpg" alt="" /></p>
+<ul>
+  <li>定义基本目录；</li>
+  <li>对常用模块定义别名，方便引用；</li>
+  <li>定义文件版本号；</li>
+  <li>处理非AMD规范的模块；</li>
+  <li>处理非AMD规范并对其他模块产生依赖的模块；</li>
+</ul>
 
-<h4 id="section-5">往东冲的方向</h4>
-<p><img src="/images/2015/20150919cross/5.jpg" alt="" /></p>
+<p>下面我们看例子：</p>
 
-<h4 id="section-6">开始</h4>
-<p><img src="/images/2015/20150919cross/6.jpg" alt="" /></p>
+<pre><code>// require.js config
+require.config({
+    baseUrl: '/common/js', // 定义基本目录
+    urlArgs: 'v=1.1.0',  // 定义请求js文件版本号
+    paths: { // 常用模块别名
+        'angular'    : 'lib/angular.min',
+        'sanitize'   : 'lib/angular-sanitize.min',
+        'zepto'      : 'lib/zepto.min'
+    },
 
-<p><img src="/images/2015/20150919cross/7.jpg" alt="" /></p>
+    // 若加载模块不符合AMD规范，直接返回全局变量，则用下面方式封装
+    // 切记：exports的变量一定要和返回的 全局变量名称 一致
+    shim: {
+        'angular': {
+	        exports: 'angular'
+        },
+        'sanitize': { // 对非AMD规范，对其他模块产生依赖依赖的要加上
+	        deps: ['angular'],
+	        exports: 'Sanitize'
+         },
+        'zepto': {
+	       exports: 'Zepto'
+       }
+    }
 
-<p><img src="/images/2015/20150919cross/8.jpg" alt="" /></p>
+});
+</code></pre>
 
-<h4 id="section-7">第一个小山头</h4>
-<p><img src="/images/2015/20150919cross/9.jpg" alt="" /></p>
+<p>上面这个就是一个很常规的require.config配置。但在实际开发中，我们是不会把这段配置加在每个主模块的头部的，不然要修改点东西，就要一个一个改，岂不是要死的心都有。</p>
 
-<p><img src="/images/2015/20150919cross/10.jpg" alt="" /></p>
+<p>一般把上面的配置信息提成一个公共js，在require.js加载前加载。</p>
 
-<h4 id="section-8">在休息</h4>
-<p><img src="/images/2015/20150919cross/11.jpg" alt="" /></p>
+<pre><code>&lt;script src="/js/config.js"&gt;&lt;/script&gt;
+&lt;script data-main="index/index" src="/js/require.js"&gt;&lt;/script&gt;
+</code></pre>
 
-<h4 id="section-9">另外一个很陡的小山头</h4>
-<p><img src="/images/2015/20150919cross/12.jpg" alt="" /></p>
+<p>但如果直接把上面这段配置放在<code>config.js</code>里会报<code>require is undefined</code>。想想也是，require.js都还没有加载。所以我们修改下：</p>
 
-<p><img src="/images/2015/20150919cross/13.jpg" alt="" /></p>
+<pre><code>// require.js config
+var require = {
+    baseUrl: '/common/js', // 定义基本目录
+    urlArgs: 'v=1.1.0',  // 定义请求js文件版本号
+    paths: { // 常用模块别名
+        'angular'    : 'lib/angular.min',
+        'sanitize'   : 'lib/angular-sanitize.min',
+        'zepto'      : 'lib/zepto.min'
+    },
 
-<h4 id="section-10">又一个小山头</h4>
-<p><img src="/images/2015/20150919cross/14.jpg" alt="" /></p>
+    // 若加载模块不符合AMD规范，直接返回全局变量，则用下面方式封装
+    // 切记：exports的变量一定要和返回的 全局变量名称 一致
+    shim: {
+        'angular': {
+	        exports: 'angular'
+        },
+        'sanitize': { // 对非AMD规范，对其他模块产生依赖依赖的要加上
+	        deps: ['angular'],
+	        exports: 'Sanitize'
+         },
+        'zepto': {
+	       exports: 'Zepto'
+       }
+    }
 
-<h4 id="section-11">后面的山</h4>
-<p><img src="/images/2015/20150919cross/15.jpg" alt="" /></p>
+});
+</code></pre>
 
-<p><img src="/images/2015/20150919cross/16.jpg" alt="" /></p>
+<p>这样就ok啦，现在可以想怎么折腾就怎么折腾了。</p>
 
-<h4 id="section-12">全景</h4>
-<p><img src="/images/2015/20150919cross/17.jpg" alt="" /></p>
+<h3 id="amd">1.4 AMD模块写法</h3>
 
-<p><img src="/images/2015/20150919cross/19.jpg" alt="" /></p>
+<p>关于AMD模块的定义，上一篇有介绍。直接定义在<code>define</code>函数中。如我们要定义url模块：</p>
 
-<h4 id="section-13">从上面滚着下来</h4>
-<p><img src="/images/2015/20150919cross/20.jpg" alt="" /></p>
+<pre><code>// url.js
+define(function (){
+　　var getId = function (key) {
+	    ...
+    };
 
-<h4 id="section-14">地面时刻</h4>
-<p><img src="/images/2015/20150919cross/21.jpg" alt="" /></p>
+　　return {
+       getId: getId
+　　};
+});
+</code></pre>
 
-<h4 id="section-15">好想游泳</h4>
-<p><img src="/images/2015/20150919cross/22.jpg" alt="" /></p>
+<p>使用方法如下：</p>
 
-<h4 id="section-16">全景2</h4>
-<p><img src="/images/2015/20150919cross/23.jpg" alt="" /></p>
+<pre><code>// main.js
+require(['url'], function (url){
+　　alert(url.getId('index'));
+});
+</code></pre>
 
-<h4 id="section-17">回望</h4>
-<p><img src="/images/2015/20150919cross/24.jpg" alt="" /></p>
+<p>若定义有依赖的模块：</p>
 
-<h4 id="section-18">过不去了</h4>
-<p><img src="/images/2015/20150919cross/25.jpg" alt="" /></p>
+<pre><code>define(['util'], function(util){
+    function each(){
+        util.doSomething();
+        ...
+    }
+    return {
+       each : each
+    };
+});
+</code></pre>
 
-<h4 id="section-19">回望</h4>
-<p><img src="/images/2015/20150919cross/26.jpg" alt="" /></p>
+<h2 id="section-4">2.如何打包压缩</h2>
 
-<h4 id="section-20">山顶</h4>
-<p><img src="/images/2015/20150919cross/27.jpg" alt="" /></p>
+<p>由于使用模块化，文件会被分成很多个，这样在浏览器端无疑会产生很多HTTP请求，会让用户的等待时间加长。对于这个问题，require.js也提出了用<code>r.js</code>合并压缩的方案。</p>
 
-<p><img src="/images/2015/20150919cross/28.jpg" alt="" /></p>
-
-<p><img src="/images/2015/20150919cross/29.jpg" alt="" /></p>
-
-<h4 id="section-21">大海</h4>
-<p><img src="/images/2015/20150919cross/30.jpg" alt="" /></p>
-
-<h4 id="section-22">终点–东冲</h4>
-<p><img src="/images/2015/20150919cross/31.jpg" alt="" /></p>
-
-<h2 id="section-23">总结</h2>
-
-<p>如果让有经验的人带一下会安全很多，一个人走会比较危险。整个过程还是刺激又好玩的，比爬山好玩多了，但没爬山安全踏实。时间要安排好，不然走到中间天黑了就麻烦了。周末会比较多人，大部分都是从东冲到西冲。跟着大部队的话不会走上歪路。</p>
-
-<p>恩，刺激，好玩。</p>
+<p>未完待续…</p>
 
 
       <ul class="pager">
@@ -288,10 +341,7 @@
 
     <div id="footer">
       <div class="container">
-        <p>&copy; 2015 dcirplan
-          with help from <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
-          and <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
-        </p>
+        <p>&copy; 2015 dcirplan</p>
       </div>
     </div>
 

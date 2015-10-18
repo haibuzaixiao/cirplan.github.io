@@ -84,3 +84,25 @@ iframe { width: 100%; height: 800px; }
   color: #FFF; }
 
 .tag-n { margin-bottom: 15px; }
+
+body {
+  background-color: #c7edcc; 
+  line-height: 180%;
+}
+
+.font-spcial {
+  font-family: Georgia, serif;
+}
+
+.page-header {
+  border-bottom-color: #fff;
+}
+
+#footer { 
+  color: #ccc;
+}
+
+h4, h5, h6 {
+  margin-top: 18px;
+}
+

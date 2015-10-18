@@ -6,7 +6,7 @@
       <a href="{{ latest_post.url }}" title="{{ latest_post.title }}">{{ latest_post.title }}</a> 
       {% if latest_post.tagline %} <small>{{ latest_post.tagline }}</small>{% endif %}
     </h1>
-    <div class="date f-c-b">Date：<span>{{ latest_post.date | date:'%Y-%m-%d' }}</span></div>
+    <div class="date f-c-b">Date：<span class="font-spcial">{{ latest_post.date | date:'%Y-%m-%d' }}</span></div>
     {% unless latest_post.tags == empty %}
     <div class="tag-n">
       <span class="tag-tip">Tag:</span>
