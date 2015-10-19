@@ -155,11 +155,260 @@ tags : [js, requirejs, module]
 
 ##2.如何打包压缩
 
-由于使用模块化，文件会被分成很多个，这样在浏览器端无疑会产生很多HTTP请求，会让用户的等待时间加长。对于这个问题，require.js也提出了用`r.js`合并压缩的方案。
+由于使用模块化，文件会被分成很多个，这样在浏览器端无疑会产生很多HTTP请求，会让用户的等待时间加长。对于这个问题，require.js也提出了用`r.js`合并压缩的方案。下面介绍r.js的使用。
 
-未完待续...
+使用r.js要安装node.js环境，未安装的自行安装。
 
+###2.1 下载r.js
+
+直接下载戳[这里][2]。或者直接用npm 安装
+
+	npm install -g requirejs
+
+###2.2 文件目录
+
+下面是示例的test目录：
+
+	test
+	    -html
+	        -index.html
+	    -dist
+	    -js
+	        -index
+	            -index.js
+	            -index2.js
+	        -lib
+	            -require.js
+	            -zepto.js
+	        -util
+	            -common.js
+	            -url.js
+	        -config.js
+	    -r.js
+	    -build.js
+
+其中`r.js`放在根目录，`build.js`为压缩配置文件，`dist`为压缩后的输出目录。下面为对应js文件的内容：
+
+	// index.js
+	define(['zepto', 'index/index2', 'url'], function($, index2, url){
+	    console.log('index');
+	});
+
+	// index2.js
+	define(['url', 'util/common'], function(url, common){
+	    console.log('index2');
+	});
+
+	// common.js
+	define([], function(){
+	    console.log('common');
+	});
+
+	// url.js
+	define(['zepto'], function($){
+	    console.log('url');
+	});
+
+	// config.js
+	var require = {
+	    baseUrl: "../js",
+	    paths: {
+	        "zepto": "lib/zepto",
+	        "url": "util/url"
+	    },
+	    shim: {
+	        'zepto':{
+	        　　exports: 'Zepto'
+	        }
+	    }
+	};
+
+下面我们来看看如何压缩。
+
+**需求1** 把index.js及其依赖项合并压缩成一个js
+
+	({
+	    baseUrl: './js',  // 设置基本目录
+	    optimize: 'none', // 压缩方式：不压缩
+	    // path和shim配置要和config.js一样
+	    paths: { 
+	　　　　　　"zepto": "lib/zepto",
+	　　　　　　"url": "util/url"
+	　　 },
+
+	    shim: {
+	        'zepto':{
+	        　　exports: 'Zepto'
+	        }
+	    },
+
+	    name: 'index/index', //设置要压缩的单个文件
+	    out : 'js/index/index-build.js' // 设置要输出的文件名
+	})	
+
+在命令行进入到项目的根目录，执行：
+
+	node r.js -o build.js
+
+就可以看到在index目录下会生成新的文件，其中最后一部分为：
+
+	...
+	  ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown', 'doubleTap', 'tap', 'singleTap', 'longTap'].forEach(function(m){
+	    $.fn[m] = function(callback){ return this.bind(m, callback) }
+	  })
+	})(Zepto)
+	;
+	define("zepto", (function (global) {
+	    return function () {
+	        var ret, fn;
+	        return ret || global.Zepto;
+	    };
+	}(this)));
+
+	define('url',['zepto'], function($){
+		console.log('url');
+	});
+	define('util/common',[], function(){
+		console.log('common');
+	});
+	define('index/index2',['url', 'util/common'], function(url, common){
+		console.log('index2');
+	});
+	define('index/index',['zepto', 'index/index2', 'url'], function($, index2, url){
+		console.log('index');
+	});
+
+**需求2** 把index.js和index2.js批量分别合并
+
+因为在实际开发中很难像上面一个一个合并，所以批量合并是比较好得方法。修改build.js如下：
+
+	({
+	    baseUrl: './js',  // 设置基本目录
+	    dir: './dist', // 设置输出目录
+	    optimize: 'none', // 压缩方式：不压缩
+	    // path和shim配置要和config.js一样
+	    paths: { 
+	　　　　　　"zepto": "lib/zepto",
+	　　　　　　"url": "util/url"
+	　　 },
+
+	    shim: {
+	        'zepto':{
+	        　　exports: 'Zepto'
+	        }
+	    },
+
+	    modules : [
+	        {
+	            name: 'index/index'
+	        },
+
+	        {
+	            name: 'index/index2'
+	        }
+	    ]
+	})
+
+这样会在`dist`目录下生成一系列文件，如下图：
+
+![](/images/2015/20151019requirejs/out1.png)
+
+对于module数组里不要求合并的js，是和原来一样的。
+
+调用直接调用这样就这样了，config.js都不用加载了：
+
+	<script data-main="../dist/index/index.js" src="../js/lib/require.js"></script>
+
+**需求3** 把zepto.js和url.js等公用文件合并成一个文件，index.js和index2.js如果有依赖这些文件时的，在合并的时候自动忽略
+
+因为把所有页面的js都压缩成一个，公用的部分每次都加载，未免会增加等待时间，所以把公用部分抽出来是一个比较好的选择。
+
+	({
+	    baseUrl: './js',  // 设置基本目录
+	    dir: './dist', // 设置输出目录
+	    optimize: 'none', // 压缩方式：不压缩
+	    // path和shim配置要和config.js一样
+	    paths: { 
+	　　　　　　"zepto": "lib/zepto",
+	　　　　　　"url": "util/url"
+	　　 },
+
+	    shim: {
+	        'zepto':{
+	        　　exports: 'Zepto'
+	        }
+	    },
+
+	    modules : [
+	        {
+	            name: 'lib/common',
+	            create: true,
+	            include: ['zepto', 'url']
+	        },
+
+	        {
+	            name: 'index/index',
+	            exclude: [
+	                'zepto',
+	                'url'
+	            ]
+	        },
+
+	        {
+	            name: 'index/index2',
+	            exclude: [
+	                'zepto',
+	                'url'
+	            ]
+	        }
+	    ]
+	})
+
+可以看到`dist/lib`下生成了`common.js`，而index.js变成了：
+
+	// index.js
+	define('util/common',[], function(){
+		console.log('common');
+	});
+	define('index/index2',['url', 'util/common'], function(url, common){
+		console.log('index2');
+	});
+	require(['zepto', 'index/index2', 'url'], function($, index2, url){
+		console.log('index');
+	});
+	define("index/index", function(){});
+
+修改`config.js`如下：
+
+	var require = {
+	    baseUrl: "../js",
+	    paths: {
+	        "zepto": "../dist/lib/common",
+	        "url": "../dist/lib/common"
+	    },
+
+	    shim: {
+	        'zepto':{
+	        　　exports: 'Zepto'
+	        }
+	    }
+	};
+
+然后直接请求:
+
+	<script src="../js/config.js"></script>
+	<script data-main="../dist/index/index.js" src="../js/lib/require.js"></script>
+
+这样就有公用模块了。更多r.js的配置看[这里][3]。
+
+如果觉得requrejs压缩后还是很大，可以尝试使用require.js作者的另一个开源项目[almond.js][4]。almond.js压缩后最小为1k左右。
+但有一个很重要的限制：所有模块必须压缩在一个文件里。almond.js的使用可以看[这里][5]。
+
+最后，选择哪种压缩策略看项目的具体需要。
 
 [1]: http://requirejs.org/
-
+[2]: http://requirejs.org/docs/release/2.1.11/r.js
+[3]: https://github.com/jrburke/r.js/blob/master/build/example.build.js
+[4]: https://github.com/jrburke/almond
+[5]: http://levi.yii.so/archives/3450
 

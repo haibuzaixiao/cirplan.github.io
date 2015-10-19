@@ -4,7 +4,7 @@
  <title>萝拔</title>
  <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2015-10-19T01:12:34+08:00</updated>
+ <updated>2015-10-20T00:11:38+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
@@ -178,9 +178,268 @@ require([&#39;url&#39;], function (url){
 
 &lt;h2 id=&quot;section-4&quot;&gt;2.如何打包压缩&lt;/h2&gt;
 
-&lt;p&gt;由于使用模块化，文件会被分成很多个，这样在浏览器端无疑会产生很多HTTP请求，会让用户的等待时间加长。对于这个问题，require.js也提出了用&lt;code&gt;r.js&lt;/code&gt;合并压缩的方案。&lt;/p&gt;
+&lt;p&gt;由于使用模块化，文件会被分成很多个，这样在浏览器端无疑会产生很多HTTP请求，会让用户的等待时间加长。对于这个问题，require.js也提出了用&lt;code&gt;r.js&lt;/code&gt;合并压缩的方案。下面介绍r.js的使用。&lt;/p&gt;
 
-&lt;p&gt;未完待续…&lt;/p&gt;
+&lt;p&gt;使用r.js要安装node.js环境，未安装的自行安装。&lt;/p&gt;
+
+&lt;h3 id=&quot;rjs&quot;&gt;2.1 下载r.js&lt;/h3&gt;
+
+&lt;p&gt;直接下载戳&lt;a href=&quot;http://requirejs.org/docs/release/2.1.11/r.js&quot;&gt;这里&lt;/a&gt;。或者直接用npm 安装&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;npm install -g requirejs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-5&quot;&gt;2.2 文件目录&lt;/h3&gt;
+
+&lt;p&gt;下面是示例的test目录：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;test
+    -html
+        -index.html
+    -dist
+    -js
+        -index
+            -index.js
+            -index2.js
+        -lib
+            -require.js
+            -zepto.js
+        -util
+            -common.js
+            -url.js
+        -config.js
+    -r.js
+    -build.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中&lt;code&gt;r.js&lt;/code&gt;放在根目录，&lt;code&gt;build.js&lt;/code&gt;为压缩配置文件，&lt;code&gt;dist&lt;/code&gt;为压缩后的输出目录。下面为对应js文件的内容：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// index.js
+define([&#39;zepto&#39;, &#39;index/index2&#39;, &#39;url&#39;], function($, index2, url){
+    console.log(&#39;index&#39;);
+});
+
+// index2.js
+define([&#39;url&#39;, &#39;util/common&#39;], function(url, common){
+    console.log(&#39;index2&#39;);
+});
+
+// common.js
+define([], function(){
+    console.log(&#39;common&#39;);
+});
+
+// url.js
+define([&#39;zepto&#39;], function($){
+    console.log(&#39;url&#39;);
+});
+
+// config.js
+var require = {
+    baseUrl: &quot;../js&quot;,
+    paths: {
+        &quot;zepto&quot;: &quot;lib/zepto&quot;,
+        &quot;url&quot;: &quot;util/url&quot;
+    },
+    shim: {
+        &#39;zepto&#39;:{
+        　　exports: &#39;Zepto&#39;
+        }
+    }
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;下面我们来看看如何压缩。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;需求1&lt;/strong&gt; 把index.js及其依赖项合并压缩成一个js&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;({
+    baseUrl: &#39;./js&#39;,  // 设置基本目录
+    optimize: &#39;none&#39;, // 压缩方式：不压缩
+    // path和shim配置要和config.js一样
+    paths: { 
+　　　　　　&quot;zepto&quot;: &quot;lib/zepto&quot;,
+　　　　　　&quot;url&quot;: &quot;util/url&quot;
+　　 },
+
+    shim: {
+        &#39;zepto&#39;:{
+        　　exports: &#39;Zepto&#39;
+        }
+    },
+
+    name: &#39;index/index&#39;, //设置要压缩的单个文件
+    out : &#39;js/index/index-build.js&#39; // 设置要输出的文件名
+})	
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在命令行进入到项目的根目录，执行：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;node r.js -o build.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;就可以看到在index目录下会生成新的文件，其中最后一部分为：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;...
+  ;[&#39;swipe&#39;, &#39;swipeLeft&#39;, &#39;swipeRight&#39;, &#39;swipeUp&#39;, &#39;swipeDown&#39;, &#39;doubleTap&#39;, &#39;tap&#39;, &#39;singleTap&#39;, &#39;longTap&#39;].forEach(function(m){
+    $.fn[m] = function(callback){ return this.bind(m, callback) }
+  })
+})(Zepto)
+;
+define(&quot;zepto&quot;, (function (global) {
+    return function () {
+        var ret, fn;
+        return ret || global.Zepto;
+    };
+}(this)));
+
+define(&#39;url&#39;,[&#39;zepto&#39;], function($){
+	console.log(&#39;url&#39;);
+});
+define(&#39;util/common&#39;,[], function(){
+	console.log(&#39;common&#39;);
+});
+define(&#39;index/index2&#39;,[&#39;url&#39;, &#39;util/common&#39;], function(url, common){
+	console.log(&#39;index2&#39;);
+});
+define(&#39;index/index&#39;,[&#39;zepto&#39;, &#39;index/index2&#39;, &#39;url&#39;], function($, index2, url){
+	console.log(&#39;index&#39;);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;需求2&lt;/strong&gt; 把index.js和index2.js批量分别合并&lt;/p&gt;
+
+&lt;p&gt;因为在实际开发中很难像上面一个一个合并，所以批量合并是比较好得方法。修改build.js如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;({
+    baseUrl: &#39;./js&#39;,  // 设置基本目录
+    dir: &#39;./dist&#39;, // 设置输出目录
+    optimize: &#39;none&#39;, // 压缩方式：不压缩
+    // path和shim配置要和config.js一样
+    paths: { 
+　　　　　　&quot;zepto&quot;: &quot;lib/zepto&quot;,
+　　　　　　&quot;url&quot;: &quot;util/url&quot;
+　　 },
+
+    shim: {
+        &#39;zepto&#39;:{
+        　　exports: &#39;Zepto&#39;
+        }
+    },
+
+    modules : [
+        {
+            name: &#39;index/index&#39;
+        },
+
+        {
+            name: &#39;index/index2&#39;
+        }
+    ]
+})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样会在&lt;code&gt;dist&lt;/code&gt;目录下生成一系列文件，如下图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2015/20151019requirejs/out1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;对于module数组里不要求合并的js，是和原来一样的。&lt;/p&gt;
+
+&lt;p&gt;调用直接调用这样就这样了，config.js都不用加载了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;script data-main=&quot;../dist/index/index.js&quot; src=&quot;../js/lib/require.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;需求3&lt;/strong&gt; 把zepto.js和url.js等公用文件合并成一个文件，index.js和index2.js如果有依赖这些文件时的，在合并的时候自动忽略&lt;/p&gt;
+
+&lt;p&gt;因为把所有页面的js都压缩成一个，公用的部分每次都加载，未免会增加等待时间，所以把公用部分抽出来是一个比较好的选择。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;({
+    baseUrl: &#39;./js&#39;,  // 设置基本目录
+    dir: &#39;./dist&#39;, // 设置输出目录
+    optimize: &#39;none&#39;, // 压缩方式：不压缩
+    // path和shim配置要和config.js一样
+    paths: { 
+　　　　　　&quot;zepto&quot;: &quot;lib/zepto&quot;,
+　　　　　　&quot;url&quot;: &quot;util/url&quot;
+　　 },
+
+    shim: {
+        &#39;zepto&#39;:{
+        　　exports: &#39;Zepto&#39;
+        }
+    },
+
+    modules : [
+        {
+            name: &#39;lib/common&#39;,
+            create: true,
+            include: [&#39;zepto&#39;, &#39;url&#39;]
+        },
+
+        {
+            name: &#39;index/index&#39;,
+            exclude: [
+                &#39;zepto&#39;,
+                &#39;url&#39;
+            ]
+        },
+
+        {
+            name: &#39;index/index2&#39;,
+            exclude: [
+                &#39;zepto&#39;,
+                &#39;url&#39;
+            ]
+        }
+    ]
+})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看到&lt;code&gt;dist/lib&lt;/code&gt;下生成了&lt;code&gt;common.js&lt;/code&gt;，而index.js变成了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// index.js
+define(&#39;util/common&#39;,[], function(){
+	console.log(&#39;common&#39;);
+});
+define(&#39;index/index2&#39;,[&#39;url&#39;, &#39;util/common&#39;], function(url, common){
+	console.log(&#39;index2&#39;);
+});
+require([&#39;zepto&#39;, &#39;index/index2&#39;, &#39;url&#39;], function($, index2, url){
+	console.log(&#39;index&#39;);
+});
+define(&quot;index/index&quot;, function(){});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;修改&lt;code&gt;config.js&lt;/code&gt;如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var require = {
+    baseUrl: &quot;../js&quot;,
+    paths: {
+        &quot;zepto&quot;: &quot;../dist/lib/common&quot;,
+        &quot;url&quot;: &quot;../dist/lib/common&quot;
+    },
+
+    shim: {
+        &#39;zepto&#39;:{
+        　　exports: &#39;Zepto&#39;
+        }
+    }
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后直接请求:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;script src=&quot;../js/config.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script data-main=&quot;../dist/index/index.js&quot; src=&quot;../js/lib/require.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样就有公用模块了。更多r.js的配置看&lt;a href=&quot;https://github.com/jrburke/r.js/blob/master/build/example.build.js&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;如果觉得requrejs压缩后还是很大，可以尝试使用require.js作者的另一个开源项目&lt;a href=&quot;https://github.com/jrburke/almond&quot;&gt;almond.js&lt;/a&gt;。almond.js压缩后最小为1k左右。
+但有一个很重要的限制：所有模块必须压缩在一个文件里。almond.js的使用可以看&lt;a href=&quot;http://levi.yii.so/archives/3450&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;最后，选择哪种压缩策略看项目的具体需要。&lt;/p&gt;
 
 </content>
  </entry>
