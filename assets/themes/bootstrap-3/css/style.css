@@ -86,8 +86,8 @@ iframe { width: 100%; height: 800px; }
 .tag-n { margin-bottom: 15px; }
 
 body {
-  background-color: #c7edcc; 
   line-height: 180%;
+  color: #444;
 }
 
 .font-spcial {
