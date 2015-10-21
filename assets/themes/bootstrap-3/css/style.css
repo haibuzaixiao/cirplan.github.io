@@ -90,6 +90,10 @@ body {
   color: #444;
 }
 
+body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Avenir Next',Avenir,'Helvetica Neue',Helvetica,'Lantinghei SC','Hiragino Sans GB','Microsoft YaHei',"å¾®è½¯é›…é»‘",STHeiti,'WenQuanYi Micro Hei',SimSun,sans-serif;
+}
+
 .font-spcial {
   font-family: Georgia, serif;
 }
