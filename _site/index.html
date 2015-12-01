@@ -133,10 +133,10 @@
 <div class="row post">
   <div class="span11">
     <h1 class="title">
-      <a href="/js/2015/10/19/js-requirejs" title="JS模块化开发（3）：require.js的使用以及压缩策略">JS模块化开发（3）：require.js的使用以及压缩策略</a> 
+      <a href="/web/2015/11/30/html5-audio" title="Audio在移动端的实践">Audio在移动端的实践</a> 
       
     </h1>
-    <div class="date f-c-b">Date：<span class="font-spcial">2015-10-19</span></div>
+    <div class="date f-c-b">Date：<span class="font-spcial">2015-11-30</span></div>
     
     <div class="tag-n">
       <span class="tag-tip">Tag:</span>
@@ -147,11 +147,11 @@
 
   
      
-    	<li><a href="/tags.html#js-ref">js <span>4</span></a></li>
+    	<li><a href="/tags.html#web-ref">web <span>3</span></a></li>
      
-    	<li><a href="/tags.html#requirejs-ref">requirejs <span>1</span></a></li>
+    	<li><a href="/tags.html#html-ref">html <span>2</span></a></li>
      
-    	<li><a href="/tags.html#module-ref">module <span>3</span></a></li>
+    	<li><a href="/tags.html#audio-ref">audio <span>1</span></a></li>
     
   
 
@@ -161,428 +161,175 @@
      
       </div>
       
-<p><a href="http://requirejs.org/">require.js</a>是遵循AMD规范的模块加载器，这里简单说说其用法和压缩策略。</p>
-
-<h2 id="section">本文内容：</h2>
-
-<p>1.基本使用</p>
-
-<p>2.如何打包压缩</p>
-
-<h2 id="section-1">基本使用</h2>
-
-<h3 id="section-2">1.1 加载</h3>
-
-<p>要使用require.js前提当然是先下载好或引入CDN。若下载好后，直接引入：</p>
-
-<pre><code>&lt;script data-main="index" src="/js/require.js"&gt;&lt;/script&gt;
+<pre><code>好久没写blog了，有三点原因，一是懒，二是懒，三是懒。
 </code></pre>
 
-<p>这里表示引入require.js后，把index.js作为程序的主模块，加载并执行。如果怕页面阻塞，可以把这段代码放到页面底部。</p>
+<p>因为最近项目里面有个需求，要在移动端用web的<code>Audio</code>实现音频播放。本想说臣妾做不到啊～然而，还是开始挖坑了。在这里记录下各种坑死人的问题。</p>
 
-<h3 id="section-3">1.2 定义主模块</h3>
+<h3 id="section">准备</h3>
 
-<p>定义主模块可以使用<code>require</code>：</p>
+<p>先看兼容性（下图），可以看到在移动端上用是完全可行的（理论上）：</p>
 
-<pre><code>// main.js
-require(['moduleA', 'moduleB', 'moduleC'], function (moduleA, moduleB, moduleC){
-    // some code here
-});
+<p><img src="/images/2015/20151130audio/compatibility.png" alt="" /></p>
+
+<p>我们再分别看看audio提供的<code>属性，方法和事件</code>：</p>
+
+<h4 id="section-1">属性</h4>
+
+<p><img src="/images/2015/20151130audio/params.png" alt="" /></p>
+
+<h4 id="section-2">方法</h4>
+
+<p><img src="/images/2015/20151130audio/way.png" alt="" /></p>
+
+<h4 id="section-3">事件</h4>
+
+<p><img src="/images/2015/20151130audio/event.png" alt="" /></p>
+
+<p>具体的可以<a href="http://www.w3school.com.cn/tags/html_ref_audio_video_dom.asp">戳这里</a>。</p>
+
+<h3 id="section-4">实践</h3>
+
+<p>其实按照上面的方法，随便怎么写怎么玩都可以，但主要有以下几个问题要解决的：</p>
+
+<pre><code>1.预加载的问题；
+2.加载进度条问题；
+3.多个音频文件切换问题；
+4.其他的兼容性问题。
 </code></pre>
 
-<p>也可以使用常规的定义模块的方式，用<code>define</code>定义，因为<code>data-main</code>已经指定这个是主模块了：</p>
+<h4 id="section-5">1.预加载的问题</h4>
 
-<pre><code>// main.js
-define(['moduleA', 'moduleB', 'moduleC'], function (moduleA, moduleB, moduleC){
-    // some code here
-});
-</code></pre>
+<p>我们先来看预加载的流程(如下)，先用<code>load</code>去加载音频，当音频可以播放就会触发<code>canplay</code>事件，表示加载已经完成，可以播放，完美。</p>
 
-<p>但有一种情况是一定要使用<code>require</code>定义的，下面会说到。</p>
+<p><img src="/images/2015/20151130audio/patten1.png" alt="" /></p>
 
-<h3 id="requirejs">1.3 require.js配置</h3>
+<p>但是，理想和现实总是有区别的，在表现不一的手机上就有问题了。</p>
 
-<p>利用<code>require.config()</code>，对require.js进行基本配置，<code>require.config()</code>要放在主模块的头部，主要作用如下：</p>
+<p>问题一：<code>load</code>方法调用了没效果，根本没有加载音频，要调用<code>play</code>方法才开始加载。</p>
+
+<p>问题二：在三星note3 和锤子T1手机上，有50%的几率预加载失败。如果预加载失败，要切换好几次<code>播放/暂停</code>状态才开始加载播放，或者一直没反应。</p>
+
+<p>问题三：一般触发<code>load</code>加载音频文件后，音频文件缓冲好会触发<code>canplay</code>事件的。</p>
+
+<p>在安卓下，触发<code>canplay</code>事件，会有下面问题：</p>
 
 <ul>
-  <li>定义基本目录；</li>
-  <li>对常用模块定义别名，方便引用；</li>
-  <li>定义文件版本号；</li>
-  <li>处理非AMD规范的模块；</li>
-  <li>处理非AMD规范并对其他模块产生依赖的模块；</li>
+  <li><code>360浏览器</code>的<code>audio.seekable</code>为<code>false</code>;</li>
+  <li><code>uc浏览器，魅族自带浏览器，微信</code>的<code>audio.buffered.length</code>居然为0；</li>
 </ul>
 
-<p>下面我们看例子：</p>
+<p>在iOS下，有以下问题：</p>
 
-<pre><code>// require.js config
-require.config({
-    baseUrl: '/common/js', // 定义基本目录
-    urlArgs: 'v=1.1.0',  // 定义请求js文件版本号
-    paths: { // 常用模块别名
-        'angular'    : 'lib/angular.min',
-        'sanitize'   : 'lib/angular-sanitize.min',
-        'zepto'      : 'lib/zepto.min'
-    },
+<ul>
+  <li><code>canplay</code>事件触发后，微信<code>的audio.seekable</code>为 <code>false</code>；</li>
+  <li><code>safari</code>在<code>load</code>了之后，<code>canplay</code>事件不触发，点击<code>play</code>后才触发 （9.1版本是正常的）；</li>
+</ul>
 
-    // 若加载模块不符合AMD规范，直接返回全局变量，则用下面方式封装
-    // 切记：exports的变量一定要和返回的 全局变量名称 一致
-    shim: {
-        'angular': {
-	        exports: 'angular'
-        },
-        'sanitize': { // 对非AMD规范，对其他模块产生依赖依赖的要加上
-	        deps: ['angular'],
-	        exports: 'Sanitize'
-         },
-        'zepto': {
-	       exports: 'Zepto'
-       }
+<p>看到这里是不是觉得坑大了，想逃？不要急，接着看。</p>
+
+<p><strong>解决方法</strong></p>
+
+<p>上面问题总的来说有俩个，一个是加载进度，另外一个就是播放Bug了。这里主要说下问题二的解决方法。</p>
+
+<p>调用<code>load</code>事件后，对加载进度进行检测，如果直到<code>canplay</code>触发，加载进度一直为0，就判断为预加载失败。然后在点击播放的，设置进度<code>audio.currentTime = 1;</code>，这样就会再次触发加载。这里还有个问题，如果是用<code>zepto</code>的<code>tap</code>监听点击播放事件，可以再次加载，但一直不播放，要监听<code>touchend</code>这些事件才行（这个问题纠结N久）。
+这样调整后，在三星note 3 和锤子T1这些有问题的手机上基本没什么问题了。</p>
+
+<h4 id="section-6">2.加载进度条问题</h4>
+
+<p>加载进度，浏览器提供了<code>progress</code>事件，但这个事件会有一些小问题，所以采用setInterval的去实行。正常来说在<code>canplay</code>的时候显示进度条：</p>
+
+<pre><code>onCanplay: function () {
+    this.seekable = this.audio.seekable &amp;&amp; this.audio.seekable.length &gt; 0;
+
+    if ( this.seekable ) {
+        this.timer = setInterval(this.onProgress.bind(this), 500);
     }
 
-});
-</code></pre>
+    var name = this.list[this.index].name || '',
+        time = this.list[this.index].time || '';
 
-<p>上面这个就是一个很常规的require.config配置。但在实际开发中，我们是不会把这段配置加在每个主模块的头部的，不然要修改点东西，就要一个一个改，岂不是要死的心都有。</p>
+    this.trigger('canplay', time, name, this.list[this.index]);
+},
 
-<p>一般把上面的配置信息提成一个公共js，在require.js加载前加载。</p>
+onProgress: function () {
+    if ( this.audio &amp;&amp; this.audio.buffered !== null &amp;&amp; this.audio.buffered.length ) {
+        this.duration = this.audio.duration === Infinity ? null : this.audio.duration;
+        this.load_percent = ((this.audio.buffered.end(this.audio.buffered.length - 1) / this.duration) * 100).toFixed(4);
+        if (isNaN(this.load_percent)) {
+            this.load_percent = 0;
+        }
 
-<pre><code>&lt;script src="/js/config.js"&gt;&lt;/script&gt;
-&lt;script data-main="index/index" src="/js/require.js"&gt;&lt;/script&gt;
-</code></pre>
+        if ( this.load_percent &gt;= 100 ) {
+            this.clearLoadProgress();
+        }
 
-<p>但如果直接把上面这段配置放在<code>config.js</code>里会报<code>require is undefined</code>。想想也是，require.js都还没有加载。所以我们修改下：</p>
-
-<pre><code>// require.js config
-var require = {
-    baseUrl: '/common/js', // 定义基本目录
-    urlArgs: 'v=1.1.0',  // 定义请求js文件版本号
-    paths: { // 常用模块别名
-        'angular'    : 'lib/angular.min',
-        'sanitize'   : 'lib/angular-sanitize.min',
-        'zepto'      : 'lib/zepto.min'
-    },
-
-    // 若加载模块不符合AMD规范，直接返回全局变量，则用下面方式封装
-    // 切记：exports的变量一定要和返回的 全局变量名称 一致
-    shim: {
-        'angular': {
-	        exports: 'angular'
-        },
-        'sanitize': { // 对非AMD规范，对其他模块产生依赖依赖的要加上
-	        deps: ['angular'],
-	        exports: 'Sanitize'
-         },
-        'zepto': {
-	       exports: 'Zepto'
-       }
+        this.trigger('progress', this.load_percent);
     }
+},
 
-});
-</code></pre>
-
-<p>这样就ok啦，现在可以想怎么折腾就怎么折腾了。</p>
-
-<h3 id="amd">1.4 AMD模块写法</h3>
-
-<p>关于AMD模块的定义，上一篇有介绍。直接定义在<code>define</code>函数中。如我们要定义url模块：</p>
-
-<pre><code>// url.js
-define(function (){
-　　var getId = function (key) {
-	    ...
-    };
-
-　　return {
-       getId: getId
-　　};
-});
-</code></pre>
-
-<p>使用方法如下：</p>
-
-<pre><code>// main.js
-require(['url'], function (url){
-　　alert(url.getId('index'));
-});
-</code></pre>
-
-<p>若定义有依赖的模块：</p>
-
-<pre><code>define(['util'], function(util){
-    function each(){
-        util.doSomething();
-        ...
+// 对于play触发后才开始加载
+play: function () {
+    if (!this.seekable) {
+        this.timer = setInterval(this.onProgress.bind(this), 500);
     }
-    return {
-       each : each
-    };
+    this.audio.play();
+},
+</code></pre>
+
+<p>上面代码的逻辑主要是检测audio的<code>buffered</code>，因为不同浏览器对buffered的解析不同，如果跳跃播放，有的会产生多段buffered，所以获取最新的缓存要这样：<code>this.audio.buffered.end(this.audio.buffered.length - 1)</code>。</p>
+
+<h4 id="section-7">3.多音频切换问题</h4>
+
+<p>在播放列表里，有多个音频文件，点击可以切换。正常的做法是，用<code>tap</code>绑定点击事件，事件内部这样处理：</p>
+
+<pre><code>audio.pause();
+audio.setAttribute('src', url);
+audio.play();
+</code></pre>
+
+<p>在PC的chrome上是很正常的，完美。但是，在手机上就嗝屁了。问题为：偶发性的出现，切换音频后，直接触发音频的<code>ended</code>事件，然后再怎么切换<code>播放/点击</code>都是无效的了。
+这个问题的解决方法很简单，就是在<code>canplay</code>触发的时候再触发<code>play</code>就好，不要切换了音频url马上<code>play</code>：</p>
+
+<pre><code>_t.audioHandler.on('canplay', function (totalTime, name) {
+    _t.audioHandler.play();
 });
 </code></pre>
 
-<h2 id="section-4">2.如何打包压缩</h2>
+<p>因为没有预加载的过程，每次都是点击列表的音频才播放，所以这样理论上是可行的。但是如果点击了播放，触发了加载，马上就点暂停，这时候<code>canplay</code>还没触发，会不会有问题？</p>
 
-<p>由于使用模块化，文件会被分成很多个，这样在浏览器端无疑会产生很多HTTP请求，会让用户的等待时间加长。对于这个问题，require.js也提出了用<code>r.js</code>合并压缩的方案。下面介绍r.js的使用。</p>
+<h4 id="section-8">4.其他的兼容性问题</h4>
 
-<p>使用r.js要安装node.js环境，未安装的自行安装。</p>
+<ul>
+  <li>关于音频的总时间，理论来说，正常加载的情况，在<code>canplay</code>的时候是可以读取到的，但因为上面一堆<code>load</code>问题，所以音频总时间要手动设置。</li>
+  <li>用<code>tab</code>去绑定播放事件好像会有奇葩的问题，用<code>touch</code>系列又太灵敏了，都接受不了可以用<code>fastclick</code>。</li>
+</ul>
 
-<h3 id="rjs">2.1 下载r.js</h3>
+<p>暂时还没发生其他问题，下面就看看例子吧。例子分两个，一个是单音频预加载播放，另外一个是多音频列表播放（UI直接用项目的了）。</p>
 
-<p>直接下载戳<a href="http://requirejs.org/docs/release/2.1.11/r.js">这里</a>。或者直接用npm 安装</p>
+<h3 id="section-9">例子1：单音频预加载播放</h3>
 
-<pre><code>npm install -g requirejs
-</code></pre>
+<p><img src="/images/2015/20151130audio/audio1.gif" alt="" /></p>
 
-<h3 id="section-5">2.2 文件目录</h3>
+<h3 id="section-10">例子2：多音频切换播放</h3>
 
-<p>下面是示例的test目录：</p>
+<p><img src="/images/2015/20151130audio/audio2.gif" alt="" /></p>
 
-<pre><code>test
-    -html
-        -index.html
-    -dist
-    -js
-        -index
-            -index.js
-            -index2.js
-        -lib
-            -require.js
-            -zepto.js
-        -util
-            -common.js
-            -url.js
-        -config.js
-    -r.js
-    -build.js
-</code></pre>
+<p>上面俩个例子的代码在<a href="https://github.com/cirplan/audioPlayer/tree/master/example">这里</a>。</p>
 
-<p>其中<code>r.js</code>放在根目录，<code>build.js</code>为压缩配置文件，<code>dist</code>为压缩后的输出目录。下面为对应js文件的内容：</p>
+<h3 id="section-11">最后</h3>
 
-<pre><code>// index.js
-define(['zepto', 'index/index2', 'url'], function($, index2, url){
-    console.log('index');
-});
+<p>实践都这里就算完了。不过<a href="http://www.cnblogs.com/Wayou/p/3543577.html">这里</a>有个更好玩的东西，有兴趣可以看看，非常酷炫。</p>
 
-// index2.js
-define(['url', 'util/common'], function(url, common){
-    console.log('index2');
-});
+<p>在开发的过程中，针对移动端，参考了<a href="https://github.com/zohararad/audio5js">Audio5js</a>，整理出了个<code>audio</code>的库。代码在<a href="https://github.com/cirplan/audioPlayer">这里</a>，有兴趣可以关注下。</p>
 
-// common.js
-define([], function(){
-    console.log('common');
-});
+<p>参考：</p>
 
-// url.js
-define(['zepto'], function($){
-    console.log('url');
-});
-
-// config.js
-var require = {
-    baseUrl: "../js",
-    paths: {
-        "zepto": "lib/zepto",
-        "url": "util/url"
-    },
-    shim: {
-        'zepto':{
-        　　exports: 'Zepto'
-        }
-    }
-};
-</code></pre>
-
-<p>下面我们来看看如何压缩。</p>
-
-<p><strong>需求1</strong> 把index.js及其依赖项合并压缩成一个js</p>
-
-<pre><code>({
-    baseUrl: './js',  // 设置基本目录
-    optimize: 'none', // 压缩方式：不压缩
-    // path和shim配置要和config.js一样
-    paths: { 
-　　　　　　"zepto": "lib/zepto",
-　　　　　　"url": "util/url"
-　　 },
-
-    shim: {
-        'zepto':{
-        　　exports: 'Zepto'
-        }
-    },
-
-    name: 'index/index', //设置要压缩的单个文件
-    out : 'js/index/index-build.js' // 设置要输出的文件名
-})	
-</code></pre>
-
-<p>在命令行进入到项目的根目录，执行：</p>
-
-<pre><code>node r.js -o build.js
-</code></pre>
-
-<p>就可以看到在index目录下会生成新的文件，其中最后一部分为：</p>
-
-<pre><code>...
-  ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown', 'doubleTap', 'tap', 'singleTap', 'longTap'].forEach(function(m){
-    $.fn[m] = function(callback){ return this.bind(m, callback) }
-  })
-})(Zepto)
-;
-define("zepto", (function (global) {
-    return function () {
-        var ret, fn;
-        return ret || global.Zepto;
-    };
-}(this)));
-
-define('url',['zepto'], function($){
-	console.log('url');
-});
-define('util/common',[], function(){
-	console.log('common');
-});
-define('index/index2',['url', 'util/common'], function(url, common){
-	console.log('index2');
-});
-define('index/index',['zepto', 'index/index2', 'url'], function($, index2, url){
-	console.log('index');
-});
-</code></pre>
-
-<p><strong>需求2</strong> 把index.js和index2.js批量分别合并</p>
-
-<p>因为在实际开发中很难像上面一个一个合并，所以批量合并是比较好得方法。修改build.js如下：</p>
-
-<pre><code>({
-    baseUrl: './js',  // 设置基本目录
-    dir: './dist', // 设置输出目录
-    optimize: 'none', // 压缩方式：不压缩
-    // path和shim配置要和config.js一样
-    paths: { 
-　　　　　　"zepto": "lib/zepto",
-　　　　　　"url": "util/url"
-　　 },
-
-    shim: {
-        'zepto':{
-        　　exports: 'Zepto'
-        }
-    },
-
-    modules : [
-        {
-            name: 'index/index'
-        },
-
-        {
-            name: 'index/index2'
-        }
-    ]
-})
-</code></pre>
-
-<p>这样会在<code>dist</code>目录下生成一系列文件，如下图：</p>
-
-<p><img src="/images/2015/20151019requirejs/out1.png" alt="" /></p>
-
-<p>对于module数组里不要求合并的js，是和原来一样的。</p>
-
-<p>调用直接调用这样就这样了，config.js都不用加载了：</p>
-
-<pre><code>&lt;script data-main="../dist/index/index.js" src="../js/lib/require.js"&gt;&lt;/script&gt;
-</code></pre>
-
-<p><strong>需求3</strong> 把zepto.js和url.js等公用文件合并成一个文件，index.js和index2.js如果有依赖这些文件时的，在合并的时候自动忽略</p>
-
-<p>因为把所有页面的js都压缩成一个，公用的部分每次都加载，未免会增加等待时间，所以把公用部分抽出来是一个比较好的选择。</p>
-
-<pre><code>({
-    baseUrl: './js',  // 设置基本目录
-    dir: './dist', // 设置输出目录
-    optimize: 'none', // 压缩方式：不压缩
-    // path和shim配置要和config.js一样
-    paths: { 
-　　　　　　"zepto": "lib/zepto",
-　　　　　　"url": "util/url"
-　　 },
-
-    shim: {
-        'zepto':{
-        　　exports: 'Zepto'
-        }
-    },
-
-    modules : [
-        {
-            name: 'lib/common',
-            create: true,
-            include: ['zepto', 'url']
-        },
-
-        {
-            name: 'index/index',
-            exclude: [
-                'zepto',
-                'url'
-            ]
-        },
-
-        {
-            name: 'index/index2',
-            exclude: [
-                'zepto',
-                'url'
-            ]
-        }
-    ]
-})
-</code></pre>
-
-<p>可以看到<code>dist/lib</code>下生成了<code>common.js</code>，而index.js变成了：</p>
-
-<pre><code>// index.js
-define('util/common',[], function(){
-	console.log('common');
-});
-define('index/index2',['url', 'util/common'], function(url, common){
-	console.log('index2');
-});
-require(['zepto', 'index/index2', 'url'], function($, index2, url){
-	console.log('index');
-});
-define("index/index", function(){});
-</code></pre>
-
-<p>修改<code>config.js</code>如下：</p>
-
-<pre><code>var require = {
-    baseUrl: "../js",
-    paths: {
-        "zepto": "../dist/lib/common",
-        "url": "../dist/lib/common"
-    },
-
-    shim: {
-        'zepto':{
-        　　exports: 'Zepto'
-        }
-    }
-};
-</code></pre>
-
-<p>然后直接请求:</p>
-
-<pre><code>&lt;script src="../js/config.js"&gt;&lt;/script&gt;
-&lt;script data-main="../dist/index/index.js" src="../js/lib/require.js"&gt;&lt;/script&gt;
-</code></pre>
-
-<p>这样就有公用模块了。更多r.js的配置看<a href="https://github.com/jrburke/r.js/blob/master/build/example.build.js">这里</a>。</p>
-
-<p>如果觉得requrejs压缩后还是很大，可以尝试使用require.js作者的另一个开源项目<a href="https://github.com/jrburke/almond">almond.js</a>。almond.js压缩后最小为1k左右。
-但有一个很重要的限制：所有模块必须压缩在一个文件里。almond.js的使用可以看<a href="http://levi.yii.so/archives/3450">这里</a>。</p>
-
-<p>最后，选择哪种压缩策略看项目的具体需要。</p>
+<ul>
+  <li><a href="http://dengo.org/archives/1048">http://dengo.org/archives/1048</a></li>
+  <li><a href="http://blog.csdn.net/alongken2005/article/details/44569981">http://blog.csdn.net/alongken2005/article/details/44569981</a></li>
+  <li><a href="http://my.oschina.net/tommyfok/blog/202234?fromerr=ECkffV18">http://my.oschina.net/tommyfok/blog/202234?fromerr=ECkffV18</a></li>
+</ul>
 
 
       <ul class="pager">

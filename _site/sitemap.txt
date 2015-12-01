@@ -8,6 +8,8 @@ jeffdeng.me/rss.xml
 jeffdeng.me/sitemap.txt
 jeffdeng.me/tags.html
 
+jeffdeng.me/web/2015/11/30/html5-audio
+jeffdeng.me/web/2015/10/26/web-file
 jeffdeng.me/js/2015/10/19/js-requirejs
 jeffdeng.me/js/2015/10/18/js-amd-cmd
 jeffdeng.me/js/2015/10/17/js-module
