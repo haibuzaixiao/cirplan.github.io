@@ -107,8 +107,13 @@ p {
 }
 
 #footer { 
+  margin-top: 0;
   color: #ccc;
   height: auto;
+}
+
+#footer p {
+  margin-top: 0;
 }
 
 h4, h5, h6 {

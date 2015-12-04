@@ -2,4 +2,4 @@
 
 [点这里][1]
 
-[1]: jeffdeng.me
+[1]: http://jeffdeng.me
