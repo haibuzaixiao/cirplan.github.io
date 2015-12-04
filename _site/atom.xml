@@ -4,13 +4,97 @@
  <title>萝拔</title>
  <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2015-12-01T19:18:59+08:00</updated>
+ <updated>2015-12-04T16:21:42+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
    <email>dcirplan@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>DOM ready原理</title>
+   <link href="jeffdeng.me/web/2015/12/03/dom-ready"/>
+   <updated>2015-12-03T00:00:00+08:00</updated>
+   <id>jeffdeng.me/web/2015/12/03/dom-ready</id>
+   <content type="html">
+&lt;p&gt;&lt;code&gt;DOM ready&lt;/code&gt;这个已经有很多人说了，说的也很详细，这里简单说下。利用问题的形式展开～&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;问：为什么需要&lt;code&gt;dom ready&lt;/code&gt;?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;答：我们需要在页面加载后，再进行一些js操作，例如：绑定事件，操作DOM。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;问：为什么不用&lt;code&gt;window.onload&lt;/code&gt;事件？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;答：&lt;code&gt;window.onload&lt;/code&gt;要等页面内的所有资源都加载完才触发，像图片、音频等，等待的时间会比较长。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;问：那直接用&lt;code&gt;DOMContentLoaded&lt;/code&gt;就好，还墨迹这么多？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;答：&lt;code&gt;DOMContentLoaded&lt;/code&gt;本来是&lt;code&gt;FireFox&lt;/code&gt;的私有事件，FF3版本才完整支持，&lt;code&gt;webkit&lt;/code&gt;系列的在525版本后才增加这个事件的支持，IE系列的在IE9才开始支持。
+可以看看它的兼容性，如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2015/1203dom/compatibility.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;问：IE在不支持&lt;code&gt;DOMContentLoaded&lt;/code&gt;事件的情况下，如何判断&lt;code&gt;DOM ready&lt;/code&gt;？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;方法一：往页面内添加&lt;code&gt;script&lt;/code&gt;标签，添加&lt;code&gt;defer&lt;/code&gt;属性，通过监听这个脚本的&lt;code&gt;readyState&lt;/code&gt;，当脚本加载完成时就判断&lt;code&gt;DOM ready&lt;/code&gt;了。&lt;/p&gt;
+
+    &lt;p&gt;但这个方法的缺点是：当页面里有&lt;code&gt;iframe&lt;/code&gt;的时候，会等&lt;code&gt;iframe&lt;/code&gt;里所有的资源加载完才触发，和&lt;code&gt;onload&lt;/code&gt;差不多。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;方法二：通过轮询来调用&lt;code&gt;document.documentElement.doScroll&lt;/code&gt;方法，调用成功表示&lt;code&gt;DOM ready&lt;/code&gt;了。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;所以，IE下用方法二来判断&lt;code&gt;DOM ready&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;问：&lt;code&gt;document.documentElement.doScroll&lt;/code&gt;是个什么鬼？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;答：IE下一些事件只有在DOM准备好后才能触发，&lt;code&gt;document.documentElement.doScroll&lt;/code&gt;就是这样一个事件。通过判断调用是否成功，进而判断DOM是否加载完。
+这个hack最早是外国的大牛发现的，详情可以看&lt;a href=&quot;http://javascript.nwbox.com/IEContentLoaded/&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;问：IE的判断完了，那&lt;code&gt;webkit&lt;/code&gt;系列的在525版本之前的怎么判断？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;答：通过轮询判断&lt;code&gt;document.readyState&lt;/code&gt;，当&lt;code&gt;readyState&lt;/code&gt;为&lt;code&gt;loaded/complete&lt;/code&gt;的时候，判断DOM加载完毕。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;问：你说的我都懂，有没有什么现成的库？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;答：基本上比较流行的库都有实现的，像&lt;code&gt;jQuery/Zepto/Prototype/Moontools/YUI&lt;/code&gt;等，只是每个库实现的方式都不同。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;github&lt;/code&gt;上也有个比较出名的库&lt;a href=&quot;https://github.com/ded/domready&quot;&gt;domready&lt;/a&gt;，现在它的主分支是针对有&lt;code&gt;DOMContentLoaded&lt;/code&gt;事件的浏览器，兼容性如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;IE9+&lt;/li&gt;
+  &lt;li&gt;Firefox 4+&lt;/li&gt;
+  &lt;li&gt;Safari 3+&lt;/li&gt;
+  &lt;li&gt;Chrome *&lt;/li&gt;
+  &lt;li&gt;Opera *&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;不过它的&lt;a href=&quot;https://github.com/ded/domready/releases/tag/v0.3.0&quot;&gt;0.3.0&lt;/a&gt;分支是兼容多种浏览器的，兼容性如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;IE6+&lt;/li&gt;
+  &lt;li&gt;Firefox 2+&lt;/li&gt;
+  &lt;li&gt;Safari 3+&lt;/li&gt;
+  &lt;li&gt;Chrome *&lt;/li&gt;
+  &lt;li&gt;Opera *&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;最后&lt;/h3&gt;
+
+&lt;p&gt;如果是用在移动端的话，可以放心的通过&lt;code&gt;DOMContentLoaded&lt;/code&gt;事件来判断。PC的话，国内现在的环境，还是乖乖用兼容版本吧。&lt;/p&gt;
+
+&lt;p&gt;参考：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.cnblogs.com/JulyZhang/archive/2011/02/12/1952484.html&quot;&gt;http://www.cnblogs.com/JulyZhang/archive/2011/02/12/1952484.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+</content>
+ </entry>
  
  <entry>
    <title>Audio在移动端的实践</title>

@@ -3,11 +3,12 @@ jeffdeng.me/archive.html
 jeffdeng.me/atom.xml
 jeffdeng.me/categories.html
 jeffdeng.me/index.html
-jeffdeng.me/pages.html
 jeffdeng.me/rss.xml
 jeffdeng.me/sitemap.txt
 jeffdeng.me/tags.html
+jeffdeng.me/zabout.html
 
+jeffdeng.me/web/2015/12/03/dom-ready
 jeffdeng.me/web/2015/11/30/html5-audio
 jeffdeng.me/web/2015/10/26/web-file
 jeffdeng.me/js/2015/10/19/js-requirejs
