@@ -1,8 +1,8 @@
 ---
 layout: post
-category : Plan
+category : 生活
 title: 2014年回顾
-tags : [2014, plan]
+tags : [2014, plan, 生活]
 ---
 {% include JB/setup %}
 

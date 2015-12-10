@@ -1,6 +1,6 @@
 ---
 layout: post
-category : Js
+category : JS
 title: JS模块化开发（3）：require.js的使用以及压缩策略
 tags : [js, requirejs, module]
 ---
