@@ -1,0 +1,7 @@
+# robots.txt 
+User-agent: *
+Disallow: /404.html
+Disallow: /javascripts
+Disallow: /font
+Disallow: /assets
+Sitemap: http://jeffdeng.me/sitemap.xml
