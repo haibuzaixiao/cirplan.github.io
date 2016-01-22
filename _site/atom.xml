@@ -4,13 +4,136 @@
  <title>萝拔</title>
  <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2016-01-20T17:06:22+08:00</updated>
+ <updated>2016-01-22T17:53:40+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
    <email>dcirplan@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Promise初级教程1-简单使用</title>
+   <link href="jeffdeng.me/js/2016/01/22/promise-study-1"/>
+   <updated>2016-01-22T00:00:00+08:00</updated>
+   <id>jeffdeng.me/js/2016/01/22/promise-study-1</id>
+   <content type="html">
+&lt;p&gt;就快过年了，项目组是准备在回去之前，发完2.4版本。然后现在已经进入测试后期了。&lt;/p&gt;
+
+&lt;p&gt;趁着现在有点时间，把之前一直想写的promise写一下。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;刚说完就来一个Bug，先去改bug。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;过了N个半小时后，又回来了。让我们直接进入主题。&lt;/p&gt;
+
+&lt;h2 id=&quot;promise-&quot;&gt;Promise 是什么&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;承诺&lt;/strong&gt;。就像有人问：你是男的吗？你可以做出俩种回答：是或者不是。&lt;/p&gt;
+
+&lt;p&gt;回答是，那就是肯定的承诺。&lt;/p&gt;
+
+&lt;p&gt;回答不是，那就是拒绝的承诺。&lt;/p&gt;
+
+&lt;p&gt;只能有俩种吗?是的，Promise里面只能有两种承诺，肯定或否定。&lt;/p&gt;
+
+&lt;p&gt;那我什么时候需要这样的承诺？感觉用不上啊？&lt;strong&gt;在异步调用的时候&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h2 id=&quot;promise&quot;&gt;Promise怎么用？&lt;/h2&gt;
+
+&lt;p&gt;一般学习一个新东西，最直接的问题是怎么用。不然有可能造成看了一堆理论，还是云里雾里。引用一句话就是：道理我都懂，然后呢？&lt;/p&gt;
+
+&lt;h3 id=&quot;promise-1&quot;&gt;新建Promise对象&lt;/h3&gt;
+
+&lt;p&gt;Promise作为构造函数，新建如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var handler = new Promise(function (resolve, reject) {
+    ... // 逻辑代码
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;嗯，新建Promise对象很简单嘛，就传入一个函数作为参数，然后逻辑代码在函数里面。这个函数再带着 resolve 和 reject 俩个函数作为参数。
+什么？resolve &amp;amp; reject是函数？没错，他们是函数。那他们有什么作用？&lt;/p&gt;
+
+&lt;p&gt;resolve 表示肯定承诺。&lt;/p&gt;
+
+&lt;p&gt;reject 表示否定承诺。&lt;/p&gt;
+
+&lt;h3 id=&quot;then&quot;&gt;then?&lt;/h3&gt;
+
+&lt;p&gt;定义了Promise对象，然后呢？然后就要处理肯定或者否定的承诺啊。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var handler = new Promise(function (resolve, reject) {
+    ... // 逻辑代码
+}); 
+
+handler.then(function (val) {
+    ... // 肯定承诺的回调
+}, function (e) {
+    ... // 否定承诺的回调
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里可以看到，&lt;code&gt;then(resolve, reject)&lt;/code&gt;方法接收两个参数，分别是肯定承诺的回调和否定承诺的回调。&lt;/p&gt;
+
+&lt;p&gt;到这里，基本的Promise使用就介绍结束了。什么？还是不懂？我们看看例子。&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;例子&lt;/h3&gt;
+
+&lt;p&gt;我们来看看这个例子，新建了Promise对象，500ms后进行了肯定的承诺。因为新版Chrome和Firefox是自带Promise，所以我们可以直接在控制台里测试。&lt;/p&gt;
+
+&lt;p&gt;肯定承诺例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// ex1
+var startTime = Date.now();
+console.log(&#39;start&#39;, startTime);
+
+var handler = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+    	resolve(&#39;done&#39;, Date.now() - startTime);
+    }, 500);
+}); 
+
+handler.then(function (val) {
+    console.log(&#39;then resolve&#39;, val, Date.now() - startTime);
+}, function (e) {
+    console.log(&#39;then reject&#39;, e, Date.now() - startTime);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/ex1.png&quot; alt=&quot;ex1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;嗯，在这个例子了，我们可以明显感受到 resolve 函数的用法。那么 reject 呢？其实是差不多的。&lt;/p&gt;
+
+&lt;p&gt;否定承诺例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// ex2
+var startTime = Date.now();
+console.log(&#39;start&#39;, startTime);
+
+var handler = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+        reject(&#39;done&#39;, Date.now() - startTime);
+    }, 500);
+}); 
+
+handler.then(function (val) {
+    console.log(&#39;then resolve&#39;, val, Date.now() - startTime);
+}, function (e) {
+    console.log(&#39;then reject&#39;, e, Date.now() - startTime);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/ex2.png&quot; alt=&quot;ex2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在上面这个例子，给出了拒绝的承诺，然后就会执行 then 方法的 reject 回调函数。是不是很简单。&lt;/p&gt;
+
+&lt;p&gt;ok，到目前为止，你可以大声的说，你会用promise啦～不过这个只是简单的介绍，让大家初步了解而已。&lt;/p&gt;
+
+&lt;p&gt;下一篇，介绍Promise的高级使用。&lt;/p&gt;
+
+</content>
+ </entry>
  
  <entry>
    <title>DOM ready原理</title>

@@ -11,6 +11,8 @@
 
     <!-- Enable responsive viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- baidu -->
+    <meta name="baidu-site-verification" content="qmZATrJMRZ" />
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="/favicon.ico">
     <!-- Bootstrap styles -->
@@ -133,23 +135,24 @@
 <div class="row post">
   <div class="span11">
     <h1 class="title">
-      <a href="/web/2015/12/03/dom-ready" title="DOM ready原理">DOM ready原理</a> 
+      <a href="/js/2016/01/22/promise-study-1" title="Promise初级教程1-简单使用">Promise初级教程1-简单使用</a> 
       
     </h1>
-    <div class="date f-c-b">Date：<span class="font-spcial">2015-12-03</span></div>
+    <div class="date f-c-b"><span class="font-spcial">2016-01-22</span></div>
     
     <div class="tag-n">
-      <span class="tag-tip">Tag:</span>
-      <ul class="tag_box">
+     <ul class="tag_box inline">
       
       
 
 
   
      
-    	<li><a href="/tags.html#web-ref">web <span>4</span></a></li>
+    	<li><a href="/tags.html#web-ref">web <span>5</span></a></li>
      
-    	<li><a href="/tags.html#dom-ref">dom <span>1</span></a></li>
+    	<li><a href="/tags.html#js-ref">js <span>8</span></a></li>
+     
+    	<li><a href="/tags.html#promise-ref">promise <span>1</span></a></li>
     
   
 
@@ -159,80 +162,119 @@
      
       </div>
       
-<p><code>DOM ready</code>这个已经有很多人说了，说的也很详细，这里简单说下。利用问题的形式展开～</p>
+<p>就快过年了，项目组是准备在回去之前，发完2.4版本。然后现在已经进入测试后期了。</p>
 
-<p><strong>问：为什么需要<code>dom ready</code>?</strong></p>
+<p>趁着现在有点时间，把之前一直想写的promise写一下。</p>
 
-<p>答：我们需要在页面加载后，再进行一些js操作，例如：绑定事件，操作DOM。</p>
+<pre><code>刚说完就来一个Bug，先去改bug。
+</code></pre>
 
-<p><strong>问：为什么不用<code>window.onload</code>事件？</strong></p>
+<p>过了N个半小时后，又回来了。让我们直接进入主题。</p>
 
-<p>答：<code>window.onload</code>要等页面内的所有资源都加载完才触发，像图片、音频等，等待的时间会比较长。</p>
+<h2 id="promise-">Promise 是什么</h2>
 
-<p><strong>问：那直接用<code>DOMContentLoaded</code>就好，还墨迹这么多？</strong></p>
+<p><strong>承诺</strong>。就像有人问：你是男的吗？你可以做出俩种回答：是或者不是。</p>
 
-<p>答：<code>DOMContentLoaded</code>本来是<code>FireFox</code>的私有事件，FF3版本才完整支持，<code>webkit</code>系列的在525版本后才增加这个事件的支持，IE系列的在IE9才开始支持。
-可以看看它的兼容性，如下：</p>
+<p>回答是，那就是肯定的承诺。</p>
 
-<p><img src="/images/2015/1203dom/compatibility.png" alt="" /></p>
+<p>回答不是，那就是拒绝的承诺。</p>
 
-<p><strong>问：IE在不支持<code>DOMContentLoaded</code>事件的情况下，如何判断<code>DOM ready</code>？</strong></p>
+<p>只能有俩种吗?是的，Promise里面只能有两种承诺，肯定或否定。</p>
 
-<ul>
-  <li>
-    <p>方法一：往页面内添加<code>script</code>标签，添加<code>defer</code>属性，通过监听这个脚本的<code>readyState</code>，当脚本加载完成时就判断<code>DOM ready</code>了。</p>
+<p>那我什么时候需要这样的承诺？感觉用不上啊？<strong>在异步调用的时候</strong>。</p>
 
-    <p>但这个方法的缺点是：当页面里有<code>iframe</code>的时候，会等<code>iframe</code>里所有的资源加载完才触发，和<code>onload</code>差不多。</p>
-  </li>
-  <li>
-    <p>方法二：通过轮询来调用<code>document.documentElement.doScroll</code>方法，调用成功表示<code>DOM ready</code>了。</p>
-  </li>
-</ul>
+<h2 id="promise">Promise怎么用？</h2>
 
-<p>所以，IE下用方法二来判断<code>DOM ready</code>。</p>
+<p>一般学习一个新东西，最直接的问题是怎么用。不然有可能造成看了一堆理论，还是云里雾里。引用一句话就是：道理我都懂，然后呢？</p>
 
-<p><strong>问：<code>document.documentElement.doScroll</code>是个什么鬼？</strong></p>
+<h3 id="promise-1">新建Promise对象</h3>
 
-<p>答：IE下一些事件只有在DOM准备好后才能触发，<code>document.documentElement.doScroll</code>就是这样一个事件。通过判断调用是否成功，进而判断DOM是否加载完。
-这个hack最早是外国的大牛发现的，详情可以看<a href="http://javascript.nwbox.com/IEContentLoaded/">这里</a>。</p>
+<p>Promise作为构造函数，新建如下：</p>
 
-<p><strong>问：IE的判断完了，那<code>webkit</code>系列的在525版本之前的怎么判断？</strong></p>
+<pre><code>var handler = new Promise(function (resolve, reject) {
+    ... // 逻辑代码
+});
+</code></pre>
 
-<p>答：通过轮询判断<code>document.readyState</code>，当<code>readyState</code>为<code>loaded/complete</code>的时候，判断DOM加载完毕。</p>
+<p>嗯，新建Promise对象很简单嘛，就传入一个函数作为参数，然后逻辑代码在函数里面。这个函数再带着 resolve 和 reject 俩个函数作为参数。
+什么？resolve &amp; reject是函数？没错，他们是函数。那他们有什么作用？</p>
 
-<p><strong>问：你说的我都懂，有没有什么现成的库？</strong></p>
+<p>resolve 表示肯定承诺。</p>
 
-<p>答：基本上比较流行的库都有实现的，像<code>jQuery/Zepto/Prototype/Moontools/YUI</code>等，只是每个库实现的方式都不同。</p>
+<p>reject 表示否定承诺。</p>
 
-<p><code>github</code>上也有个比较出名的库<a href="https://github.com/ded/domready">domready</a>，现在它的主分支是针对有<code>DOMContentLoaded</code>事件的浏览器，兼容性如下：</p>
+<h3 id="then">then?</h3>
 
-<ul>
-  <li>IE9+</li>
-  <li>Firefox 4+</li>
-  <li>Safari 3+</li>
-  <li>Chrome *</li>
-  <li>Opera *</li>
-</ul>
+<p>定义了Promise对象，然后呢？然后就要处理肯定或者否定的承诺啊。</p>
 
-<p>不过它的<a href="https://github.com/ded/domready/releases/tag/v0.3.0">0.3.0</a>分支是兼容多种浏览器的，兼容性如下：</p>
+<pre><code>var handler = new Promise(function (resolve, reject) {
+    ... // 逻辑代码
+}); 
 
-<ul>
-  <li>IE6+</li>
-  <li>Firefox 2+</li>
-  <li>Safari 3+</li>
-  <li>Chrome *</li>
-  <li>Opera *</li>
-</ul>
+handler.then(function (val) {
+    ... // 肯定承诺的回调
+}, function (e) {
+    ... // 否定承诺的回调
+});
+</code></pre>
 
-<h3 id="section">最后</h3>
+<p>这里可以看到，<code>then(resolve, reject)</code>方法接收两个参数，分别是肯定承诺的回调和否定承诺的回调。</p>
 
-<p>如果是用在移动端的话，可以放心的通过<code>DOMContentLoaded</code>事件来判断。PC的话，国内现在的环境，还是乖乖用兼容版本吧。</p>
+<p>到这里，基本的Promise使用就介绍结束了。什么？还是不懂？我们看看例子。</p>
 
-<p>参考：</p>
+<h3 id="section">例子</h3>
 
-<ul>
-  <li><a href="http://www.cnblogs.com/JulyZhang/archive/2011/02/12/1952484.html">http://www.cnblogs.com/JulyZhang/archive/2011/02/12/1952484.html</a></li>
-</ul>
+<p>我们来看看这个例子，新建了Promise对象，500ms后进行了肯定的承诺。因为新版Chrome和Firefox是自带Promise，所以我们可以直接在控制台里测试。</p>
+
+<p>肯定承诺例子：</p>
+
+<pre><code>// ex1
+var startTime = Date.now();
+console.log('start', startTime);
+
+var handler = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+    	resolve('done', Date.now() - startTime);
+    }, 500);
+}); 
+
+handler.then(function (val) {
+    console.log('then resolve', val, Date.now() - startTime);
+}, function (e) {
+    console.log('then reject', e, Date.now() - startTime);
+});
+</code></pre>
+
+<p><img src="/images/2016/20160122promise/ex1.png" alt="ex1" /></p>
+
+<p>嗯，在这个例子了，我们可以明显感受到 resolve 函数的用法。那么 reject 呢？其实是差不多的。</p>
+
+<p>否定承诺例子：</p>
+
+<pre><code>// ex2
+var startTime = Date.now();
+console.log('start', startTime);
+
+var handler = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+        reject('done', Date.now() - startTime);
+    }, 500);
+}); 
+
+handler.then(function (val) {
+    console.log('then resolve', val, Date.now() - startTime);
+}, function (e) {
+    console.log('then reject', e, Date.now() - startTime);
+});
+</code></pre>
+
+<p><img src="/images/2016/20160122promise/ex2.png" alt="ex2" /></p>
+
+<p>在上面这个例子，给出了拒绝的承诺，然后就会执行 then 方法的 reject 回调函数。是不是很简单。</p>
+
+<p>ok，到目前为止，你可以大声的说，你会用promise啦～不过这个只是简单的介绍，让大家初步了解而已。</p>
+
+<p>下一篇，介绍Promise的高级使用。</p>
 
 
       <ul class="pager">

@@ -54,7 +54,8 @@ iframe { width: 100%; height: 800px; }
   vertical-align: middle; }
 
 .tag_box li {
-  line-height: 28px; }
+  line-height: 28px;
+}
 
 .tag_box li i {
   opacity: 0.9; }
