@@ -1,7 +1,7 @@
 ---
 layout: post
 category : js
-title: Promise初级教程1-简单使用
+title: Promise初级教程1：简单使用
 tags : [web, js, promise]
 ---
 {% include JB/setup %}

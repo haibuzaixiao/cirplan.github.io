@@ -4,7 +4,7 @@
  <title>萝拔</title>
  <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2016-01-22T17:53:40+08:00</updated>
+ <updated>2016-01-22T18:01:06+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
@@ -13,7 +13,7 @@
 
  
  <entry>
-   <title>Promise初级教程1-简单使用</title>
+   <title>Promise初级教程1：简单使用</title>
    <link href="jeffdeng.me/js/2016/01/22/promise-study-1"/>
    <updated>2016-01-22T00:00:00+08:00</updated>
    <id>jeffdeng.me/js/2016/01/22/promise-study-1</id>
@@ -498,7 +498,7 @@ audio.play();
  </entry>
  
  <entry>
-   <title>JS模块化开发（3）：require.js的使用以及压缩策略</title>
+   <title>JS模块化开发3：require.js的使用以及压缩策略</title>
    <link href="jeffdeng.me/js/2015/10/19/js-requirejs"/>
    <updated>2015-10-19T00:00:00+08:00</updated>
    <id>jeffdeng.me/js/2015/10/19/js-requirejs</id>
@@ -930,7 +930,7 @@ define(&quot;index/index&quot;, function(){});
  </entry>
  
  <entry>
-   <title>JS模块化开发（2）：AMD与CMD规范</title>
+   <title>JS模块化开发2：AMD与CMD规范</title>
    <link href="jeffdeng.me/js/2015/10/18/js-amd-cmd"/>
    <updated>2015-10-18T00:00:00+08:00</updated>
    <id>jeffdeng.me/js/2015/10/18/js-amd-cmd</id>
@@ -1263,7 +1263,7 @@ define([&#39;./a&#39;, &#39;./b&#39;], function(a, b) { // 依赖必须一开始
  </entry>
  
  <entry>
-   <title>JS模块化开发（1）：历史</title>
+   <title>JS模块化开发1：历史</title>
    <link href="jeffdeng.me/js/2015/10/17/js-module"/>
    <updated>2015-10-17T00:00:00+08:00</updated>
    <id>jeffdeng.me/js/2015/10/17/js-module</id>
