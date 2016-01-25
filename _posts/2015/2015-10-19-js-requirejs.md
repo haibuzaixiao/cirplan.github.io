@@ -115,7 +115,7 @@ tags : [js, requirejs, module]
 	       }
 	    }
 
-	});
+	};
 
 这样就ok啦，现在可以想怎么折腾就怎么折腾了。
 
