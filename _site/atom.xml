@@ -4,13 +4,569 @@
  <title>萝拔</title>
  <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2016-01-25T10:19:04+08:00</updated>
+ <updated>2016-01-27T17:21:27+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
    <email>dcirplan@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Promise初级教程3：解析流程</title>
+   <link href="jeffdeng.me/js/2016/01/26/promise-study-3"/>
+   <updated>2016-01-26T00:00:00+08:00</updated>
+   <id>jeffdeng.me/js/2016/01/26/promise-study-3</id>
+   <content type="html">
+&lt;p&gt;接上篇，下面的序号是为了与&lt;a href=&quot;https://promisesaplus.com/&quot;&gt;规范&lt;/a&gt;中一致。&lt;/p&gt;
+
+&lt;h2 id=&quot;promise-&quot;&gt;2.3. Promise 解析流程&lt;/h2&gt;
+
+&lt;p&gt;这里主要是根据规范来看，要注意哈，搬运工又来了。&lt;/p&gt;
+
+&lt;p&gt;Promise 解析过程 是以一个 promise 和一个值 x 做为参数的抽象过程，可表示为 &lt;code&gt;[[Resolve]](promise, x)&lt;/code&gt;, 过程如下：&lt;/p&gt;
+
+&lt;h5 id=&quot;promise--x---typeerror--promise-&quot;&gt;2.3.1 如果 promise 和 x 指向相同的值, 使用 TypeError 做为原因将 promise 拒绝，如下：&lt;/h5&gt;
+
+&lt;pre&gt;&lt;code&gt;var promise = Promise.resolve(&#39;done&#39;).then(function () {
+    return promise;
+});
+
+promise.then(null, function (reason) {
+    console.log(&#39;error&#39;, reason);
+});
+// error TypeError: Chaining cycle detected for promise #&amp;lt;Promise&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h5 id=&quot;x--promise--&quot;&gt;2.3.2 如果 x 是一个 promise , 采用其状态:&lt;/h5&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;2.3.2.1 如果 x 是 pending 状态，promise 必须保持 pending 走到 x fulfilled 或 rejected。&lt;/li&gt;
+  &lt;li&gt;2.3.2.2 如果 x 是 fulfilled 状态，将 x 的值用于 fulfill promise。&lt;/li&gt;
+  &lt;li&gt;2.3.2.3 如果 x 是 rejected 状态, 将 x 的原因用于 reject promise。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var dummy = { dummy: &quot;dummy&quot; };
+
+// 2.3.2.1，x 是 pending 状态
+function xFactory() {
+    return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+            resolve(1000);
+        }, 1000);
+    });
+}
+
+var promise = Promise.resolve(dummy).then(function () {
+    return xFactory();
+});
+
+promise.then(
+    function (val) {
+        console.log(&#39;resolve&#39;, val);
+    },
+    function (e) {
+        console.log(&#39;reject&#39;, e);
+    }
+);
+// resolve 1000
+
+// 2.3.2.2，x 是 fulfilled 状态
+var promise = Promise.resolve(dummy).then(function () {
+    return Promise.resolve(&#39;done&#39;);
+});
+
+promise.then(
+    function (val) {
+        console.log(&#39;resolve&#39;, val);
+    },
+    function (e) {
+        console.log(&#39;reject&#39;, e);
+    }
+);
+// resolve done
+
+// 2.3.2.3，x 是 rejected 状态
+var promise = Promise.resolve(dummy).then(function () {
+    return Promise.reject(&#39;error&#39;);
+});
+
+promise.then(
+    function (val) {
+        console.log(&#39;resolve&#39;, val);
+    },
+    function (e) {
+        console.log(&#39;reject&#39;, e);
+    }
+);
+// reject error
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h5 id=&quot;x-&quot;&gt;2.3.3 如果 x 是一个对象或一个函数:&lt;/h5&gt;
+
+&lt;p&gt;2.3.3.1 将 then 赋为 x.then&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// 1. 当 x 为没有原型的对象时
+var numberOfTimesThenWasRetrieved = 0;
+
+function xFactory() {
+    return Object.create(null, {
+        then: {
+            get: function () {
+                ++numberOfTimesThenWasRetrieved;
+                return function thenMethodForX(onFulfilled) {
+                    onFulfilled();
+                };
+            }
+        }
+    });
+}
+
+var promise = Promise.resolve(dummy).then(function onBasePromiseFulfilled() {
+    return xFactory();
+});
+
+console.log(promise);
+// Promise {[[PromiseStatus]]: &quot;pending&quot;, [[PromiseValue]]: undefined}
+
+promise.then(function () {
+    console.log(numberOfTimesThenWasRetrieved);
+});
+// 1
+
+// 2. 当 x 为有基本原型的对象，修改如下
+function xFactory() {
+    return Object.create(Object.prototype, {
+        then: {
+            get: function () {
+                ++numberOfTimesThenWasRetrieved;
+                return function thenMethodForX(onFulfilled) {
+                    onFulfilled();
+                };
+            }
+        }
+    });
+}
+// 1
+
+// 3. 当 x 为函数时
+function xFactory() {
+    function x() { }
+
+    Object.defineProperty(x, &quot;then&quot;, {
+        get: function () {
+            ++numberOfTimesThenWasRetrieved;
+            return function thenMethodForX(onFulfilled) {
+                onFulfilled();
+            };
+        }
+    });
+
+    return x;
+}
+// 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2.3.3.2 如果在取 x.then 值时抛出了异常，则以这个异常做为原因将 promise 拒绝&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// 取 x.then 的时候，出现错误
+function xFactory() {
+    return Object.create(Object.prototype, {
+        then: {
+            get: function () {
+                throw Error(&#39;error&#39;);
+            }
+        }
+    });
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise_catch_1.png&quot; alt=&quot;promise_catch_1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;2.3.3.3 如果 then 是一个函数， 以 x 为 this 调用 then 函数，且第一个参数是 resolvePromise，第二个参数是 rejectPromise，且：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;2.3.3.3.1 当 resolvePromise 被以 y 为参数调用, 执行 &lt;code&gt;[[Resolve]](promise, y)&lt;/code&gt;。&lt;/li&gt;
+  &lt;li&gt;2.3.3.3.2 当 rejectPromise 被以 r 为参数调用, 则以 r 为原因将 promise 拒绝。&lt;/li&gt;
+  &lt;li&gt;2.3.3.3.3 如果 resolvePromise 和 rejectPromise 都被调用了，或者被调用了多次，则只第一次有效，后面的忽略。&lt;/li&gt;
+  &lt;li&gt;2.3.3.3.4 如果在调用 then 时抛出了异常，则。
+    &lt;ul&gt;
+      &lt;li&gt;2.3.3.3.4.1 如果 resolvePromise 或 rejectPromise 已经被调用了，则忽略它。&lt;/li&gt;
+      &lt;li&gt;2.3.3.3.4.2 否则, 以 e 为 reason 将 promise 拒绝。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个有点绕，看测试代码也挺复杂。这里就不贴代码了（测试代码900多行），有兴趣直接看 &lt;a href=&quot;https://github.com/promises-aplus/promises-tests/blob/master/lib/tests/2.3.3.js&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;所以，回到之前的问题：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise_resolve_4.png&quot; alt=&quot;resolve_4&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这个看 2.3.3.4，因为请求错误的接口，在调用 then 时抛出了异常，所以会进入到 Rejected 状态。&lt;/p&gt;
+
+&lt;p&gt;哎，感觉这个流程还是有点问题，再琢磨琢磨。&lt;/p&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Promise初级教程2：详细介绍</title>
+   <link href="jeffdeng.me/js/2016/01/25/promise-stydy-2"/>
+   <updated>2016-01-25T00:00:00+08:00</updated>
+   <id>jeffdeng.me/js/2016/01/25/promise-stydy-2</id>
+   <content type="html">
+&lt;p&gt;上一篇简单介绍了 Promise 的外形，让大家了解 Promise 是什么样的，可以用在哪里，有个心理准备。不然突然跳出个恐龙出来，吓你们一跳，233。
+其实这篇文章才算正式介绍 Promise，咳咳…&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;本来想周末写的，不过遇到了广东百年难遇的下雪天气，一直窝在床上发抖，所以拖到现在（好吧，其实是懒）。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Promise 已经有很多人介绍了，这里安利一些比较值得看的文章，不妨先看看。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.html5rocks.com/zh/tutorials/es6/promises/&quot;&gt;JavaScript Promises&lt;/a&gt;（如果打不开，请翻墙）；&lt;/li&gt;
+  &lt;li&gt;阮大大的 &lt;a href=&quot;http://es6.ruanyifeng.com/#docs/promise&quot;&gt;Promise对象&lt;/a&gt;；&lt;/li&gt;
+  &lt;li&gt;网友翻译的 &lt;a href=&quot;http://liubin.org/promises-book/&quot;&gt;JavaScript Promise迷你书&lt;/a&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;估计上面的看完，对 Promise 的大概都懂了，那接下来的内容，理论上可以不用看了，因为上面的已经说的很全很详细了～～不过，我还是按个人理解，整理一下。&lt;/p&gt;
+
+&lt;h2 id=&quot;promise-&quot;&gt;1. Promise 定义&lt;/h2&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;1.1 是什么&lt;/h3&gt;
+
+&lt;p&gt;Promise 是抽象异步处理对象以及对其进行各种操作的组件 – 来自 &lt;a href=&quot;http://liubin.org/promises-book/&quot;&gt;JavaScript Promise迷你书&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;1.2 规范&lt;/h3&gt;
+
+&lt;p&gt;ES6 的[Promise][0]是遵循 &lt;a href=&quot;https://promisesaplus.com/&quot;&gt;Promises/A+&lt;/a&gt; 规范的。Promises/A+ 一开始是社区规范，然后大部分的 Promise 类库遵循了这个规范，所以渐渐变成了一个标准。
+所以我们可以通过 Promises/A+ 的规范去学习 Promise。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://segmentfault.com/a/1190000002452115&quot;&gt;Promises/A+中文版翻译&lt;/a&gt;在这里，英文看不太懂可以看看翻译版本。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;1.3 状态&lt;/h3&gt;
+
+&lt;p&gt;每个 Promise 对象有一种状态：Pending（等待）、Resolved/Fulfilled（成功）和 Rejected（失败）中的一种，变化过程如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise_states.png&quot; alt=&quot;promise_state&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;如上图，状态只能从 Pending 变为 Resolved 或者 Rejected 两者之中的一种，&lt;strong&gt;过程不可以逆转&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h2 id=&quot;promise--1&quot;&gt;2. Promise 用法&lt;/h2&gt;
+
+&lt;p&gt;这里主要介绍 Promise 的一些方法。&lt;/p&gt;
+
+&lt;h3 id=&quot;new-promise&quot;&gt;2.1 new Promise&lt;/h3&gt;
+
+&lt;p&gt;通过 new，新建 Promise 对象，这是最常规的用法。看上一篇文章的例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// ex1
+var startTime = Date.now();
+console.log(&#39;start&#39;, startTime);
+
+var handler = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+        resolve(&#39;done&#39;, Date.now() - startTime);
+    }, 500);
+}); 
+
+handler.then(function (val) {
+    console.log(&#39;then resolve&#39;, val, Date.now() - startTime);
+}, function (e) {
+    console.log(&#39;then reject&#39;, e, Date.now() - startTime);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;结果很明显，是进入成功承诺的回调，这里没什么好说的。&lt;/p&gt;
+
+&lt;h3 id=&quot;promiseresolve&quot;&gt;2.2 Promise.resolve&lt;/h3&gt;
+
+&lt;p&gt;静态方法 &lt;code&gt;Promise.resolve(value)&lt;/code&gt; 是 &lt;code&gt;new Promise()&lt;/code&gt; 的快捷方式。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Promise.resolve(42); 
+
+// 等价于
+new Promise(function(resolve){
+    resolve(42);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;value-&quot;&gt;问题：参数 value 可以是什么？&lt;/h4&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;空。&lt;/li&gt;
+  &lt;li&gt;普通的对象。&lt;/li&gt;
+  &lt;li&gt;带有 then 方法的不标准 Promise 对象。&lt;/li&gt;
+  &lt;li&gt;Promise 对象。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;下面让我们一个个来验证，下面结果是在 chrome &amp;amp; firefox 里的调试结果。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-3&quot;&gt;2.2.1 空&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;如果不传参数&lt;/strong&gt;，则返回一个 value 为 undefined 的 Promise 对象。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// value 为空，返回的Promise对象value为undefined
+Promise.resolve() 
+// chrome  --&amp;gt; Promise {[[PromiseStatus]]: &quot;resolved&quot;, [[PromiseValue]]: undefined}
+// firefox --&amp;gt; Promise { &amp;lt;state&amp;gt;: &quot;fulfilled&quot;, &amp;lt;value&amp;gt;: undefined }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;section-4&quot;&gt;2.2.2 普通的对象&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;如果参数为普通对象&lt;/strong&gt;，返回状态为 Resolve 的 Promise 对象，其 value 为传人的参数。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// value 为string
+Promise.resolve(&#39;42&#39;) 
+// chrome  --&amp;gt; Promise {[[PromiseStatus]]: &quot;resolved&quot;, [[PromiseValue]]: &quot;42&quot;}
+// firefox --&amp;gt; Promise { &amp;lt;state&amp;gt;: &quot;fulfilled&quot;, &amp;lt;value&amp;gt;: &quot;42&quot; }
+
+// value 为 object
+Promise.resolve({a:1}) 
+// chrome  --&amp;gt; Promise {[[PromiseStatus]]: &quot;resolved&quot;, [[PromiseValue]]: Object}
+// firefox --&amp;gt; Promise { &amp;lt;state&amp;gt;: &quot;fulfilled&quot;, &amp;lt;value&amp;gt;: Object }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;then--promise-&quot;&gt;2.2.3 带有 then 方法的不标准 Promise 对象&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;如果参数为带有then方法的不标准 Promise 对象&lt;/strong&gt;，返回新的 Promise 对象。我们先来看 jQuery 的 &lt;code&gt;$.ajax&lt;/code&gt; 方法返回的 deferred 对象。
+页面引入 jQuery-2.1.4，如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/ajax.png&quot; alt=&quot;jQuery_ajax&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;通过上图，我们可以知道 deferred 对象是 thenable（包含了then方法的对象或函数）对象，但不是标准的 Promise 对象（怎样才算标准的Promise对象？）。&lt;/p&gt;
+
+&lt;p&gt;那看看通过 Promise.resolve 转换效果，先看请求成功的返回结果，可以看到 &lt;code&gt;[[PromiseValue]]&lt;/code&gt; 就是 $.ajax 的 deffered 对象，如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise_resolve_1.png&quot; alt=&quot;resolve_1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;再看看请求错误的时候结果，如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise_resolve_2.png&quot; alt=&quot;resolve_2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;有没有看出什么？是不是成功或失败，返回 Promise 对象的状态都是 resolved ？那是不是都进入 resolved 的回调？想一下好像是的哦，让我们来验证下～&lt;/p&gt;
+
+&lt;p&gt;先看请求成功的时候，其实没什么悬念：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var handler = Promise.reject($.ajax(&#39;/stock/chart/1414672685/position&#39;));
+handler.then(function (val) {
+    console.log(&#39;resolve&#39;, val);
+}, function (e) {
+    console.log(&#39;rejected&#39;, e);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise_resolve_3.png&quot; alt=&quot;resolve_3&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;再看看请求错误的时候：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var handler = Promise.reject($.ajax(&#39;/stock/chart/1414672685/position123&#39;));
+handler.then(function (val) {
+    console.log(&#39;resolve&#39;, val);
+}, function (e) {
+    console.log(&#39;rejected&#39;, e);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise_resolve_4.png&quot; alt=&quot;resolve_4&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;纳尼，&lt;strong&gt;为什么进入 rejected 的回调了&lt;/strong&gt;？不是说好 Promise 的状态，一旦从 Pending 到 Resolved 或 Rejected 就不能改变了吗？你们说这是为什么？&lt;/p&gt;
+
+&lt;p&gt;有人说，看上面两张图中 Promise 打印出来的状态是 &lt;code&gt;Pending&lt;/code&gt;，秘密所在。咳咳，其实 &lt;code&gt;Promise.then&lt;/code&gt; 方法会返回一个新的 Promise 对象，方便链式调用而已。&lt;/p&gt;
+
+&lt;p&gt;其实这个问题与 &lt;code&gt;Promise&lt;/code&gt; 的解析流程有关，我们待会再看这个问题～&lt;/p&gt;
+
+&lt;h4 id=&quot;promise--2&quot;&gt;2.2.4 Promise 对象&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;如果参数为 Promise 对象&lt;/strong&gt;，直接返回该 Promise 对象：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var promise1 = new Promise(function (resolve, rejected) {
+    resolve(&#39;done&#39;)
+});
+Promise.resolve(promise1);
+
+var promise1 = new Promise(function (resolve, rejected) {
+    rejected(&#39;fail&#39;)
+});
+Promise.resolve(promise1);  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise_resolve_5.png&quot; alt=&quot;resolve_5&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;promisereject&quot;&gt;2.2 Promise.reject&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;Promise.reject(error)&lt;/code&gt; 是和 &lt;code&gt;Promise.resolve(value)&lt;/code&gt; 类似的静态方法，是 &lt;code&gt;new Promise()&lt;/code&gt; 方法的快捷方式。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Promise.reject(new Error(&quot;出错了&quot;))
+
+// 等价于
+new Promise(function(resolve,reject){
+    reject(new Error(&quot;出错了&quot;));
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;正常来说，Promise.reject 的参数都应该是error对象，这个没什么好说的。&lt;/p&gt;
+
+&lt;h3 id=&quot;promisethen&quot;&gt;2.3 Promise.then&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;Promise.then&lt;/code&gt; 是 Promise 里比较重要的一个方法，在 &lt;a href=&quot;https://promisesaplus.com/&quot;&gt;Promises/A+&lt;/a&gt; 规范中，很大部分的篇幅就介绍这个方法。&lt;/p&gt;
+
+&lt;p&gt;then 方法，第一个参数是 Resolved 状态的回调函数，第二个参数（可选）是 Rejected 状态的回调函数，调用后返回新的 Promise 对象。就这么看，是不是完了？&lt;/p&gt;
+
+&lt;h4 id=&quot;section-5&quot;&gt;我们主要关注下面的两点：&lt;/h4&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;规范。&lt;/li&gt;
+  &lt;li&gt;返回新 Promise 对象的状态是怎么决定的。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;section-6&quot;&gt;2.3.1 规范&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;Promise.then(onFulfilled, onRejected)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;onFulfilled&lt;/code&gt; &amp;amp; &lt;code&gt;onRejected&lt;/code&gt;  的特点：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;可选。&lt;/li&gt;
+  &lt;li&gt;必须是函数，不然忽略。&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;onFulfilled&lt;/code&gt; 必须在 Promise 的 Resolve 状态后调用，Promise 的 value 为其第一个参数，只能被调用一次。&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;onRejected&lt;/code&gt; 必须在 Promise 的 Rejected 状态后调用，Promise 的 reason 为其第一个参数，只能被调用一次。&lt;/li&gt;
+  &lt;li&gt;当成函数般调用（this为undefined）。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;对于一个Promise , &lt;code&gt;then&lt;/code&gt; 可以被调用多次：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;当 Promise &lt;code&gt;fulfilled&lt;/code&gt; 后，所有 onFulfilled 都必须按照其注册顺序执行。&lt;/li&gt;
+  &lt;li&gt;当 Promise &lt;code&gt;rejected&lt;/code&gt; 后，所有 OnRejected 都必须按照其注册顺序执行。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;promise&quot;&gt;2.3.2 返回新 Promise&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;promise2 = promise1.then(onFulfilled, onRejected);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;如果 onFulfilled 或 onRejected 返回了值 x, 则执行 Promise 解析流程 &lt;code&gt;[[Resolve]](promise2, x)&lt;/code&gt;。&lt;/li&gt;
+  &lt;li&gt;如果 onFulfilled 或 onRejected 抛出了异常 e, 则 promise2 应当以 e 为 reason 被拒绝。&lt;/li&gt;
+  &lt;li&gt;如果 onFulfilled 不是一个函数且 promise1 已经 fulfilled，则 promise2 必须以 promise1 的值 fulfilled。&lt;/li&gt;
+  &lt;li&gt;如果 OnReject 不是一个函数且 promise1 已经 rejected, 则 promise2 必须以相同的 reason 被拒绝。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;好吧，上面这些都是照搬规范的东西而已（我只是个搬运工，哭），基本上看一遍就知道怎么回事了。&lt;/p&gt;
+
+&lt;h3 id=&quot;promisecatch&quot;&gt;2.4 Promise.catch&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;Promise.catch&lt;/code&gt; 只是 &lt;code&gt;Promise.then(undefined, onRejected)&lt;/code&gt; 方法的一个别名。&lt;/p&gt;
+
+&lt;p&gt;这里盗个例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;function taskA() {
+    console.log(&quot;Task A&quot;);
+}
+function taskB() {
+    console.log(&quot;Task B&quot;);
+}
+function onRejected(error) {
+    console.log(&quot;Catch Error: A or B&quot;, error);
+}
+function finalTask() {
+    console.log(&quot;Final Task&quot;);
+}
+
+var promise = Promise.resolve();
+promise
+    .then(taskA)
+    .then(taskB)
+    .catch(onRejected)
+    .then(finalTask);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/2016/20160122promise/promise-then-catch-flow.png&quot; alt=&quot;promise-then-catch-flow&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;特点：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;错误具有冒泡性，一直到捕获为止。&lt;/li&gt;
+  &lt;li&gt;IE8 下 &lt;code&gt;promise.catch&lt;/code&gt; 有保留字问题，用 &lt;code&gt;promise[&quot;catch&quot;]&lt;/code&gt; 则没问题。&lt;/li&gt;
+  &lt;li&gt;如果没有发生错误，&lt;code&gt;catch&lt;/code&gt;会自动被忽略。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;promiseall&quot;&gt;2.5 Promise.all&lt;/h3&gt;
+
+&lt;p&gt;Promise.all 接收一个 promise 对象的数组作为参数，返回一个新的 promise 对象，特点如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;当数组内所有 promise 对象的状态为 Resolve，其状态才为 Resolve。&lt;/li&gt;
+  &lt;li&gt;当数组内有一个 promise 对象的状态为 Rejected，其状态就为 Rejected（这点promise迷你书中的说法是有误的）。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;看测试代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// 第一种情况
+var promise1 = Promise.resolve(1);
+var promise2 = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+        resolve(&#39;error&#39;);
+    }, 1000);
+});
+var promise3 = Promise.all([promise1, promise2]);
+promise3.then(function (val) {
+    console.log(&#39;resolve&#39;, val);
+}, function (e) {
+    console.log(&#39;reject&#39;, e);
+});
+// resolve [1, &quot;error&quot;]
+
+// 第二种情况
+var promise1 = Promise.reject(1);
+var promise2 = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+        resolve(&#39;error&#39;);
+    }, 1000);
+});
+var promise3 = Promise.all([promise1, promise2]);
+promise3.then(function (val) {
+    console.log(&#39;resolve&#39;, val);
+}, function (e) {
+    console.log(&#39;reject&#39;, e);
+});
+// reject 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;promiserace&quot;&gt;2.6 Promise.race&lt;/h3&gt;
+
+&lt;p&gt;Promise.all 的相对方法，只要数组内有一个 promise 对象的状态改变，其状态就改变。&lt;/p&gt;
+
+&lt;p&gt;看测试代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var promise1 = Promise.resolve(1);
+var promise2 = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+        resolve(&#39;error&#39;);
+    }, 1000);
+});
+var promise3 = Promise.race([promise1, promise2]);
+promise3.then(function (val) {
+    console.log(&#39;resolve&#39;, val);
+}, function (e) {
+    console.log(&#39;reject&#39;, e);
+});
+// resolve 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;到这里，Promise 的方法已经介绍完了。然而上面还有个问题没解决，让我们来看下 Promise 的解析流程。&lt;/p&gt;
+
+&lt;p&gt;本来想接着写的，不过真的太长了，怕大家看的头晕。&lt;/p&gt;
+
+&lt;p&gt;所以，有兴趣的话，请看下一篇 &lt;a href=&quot;/js/2016/01/26/promise-study-3/&quot;&gt;Promise 的解析流程&lt;/a&gt;。&lt;/p&gt;
+
+</content>
+ </entry>
  
  <entry>
    <title>Promise初级教程1：简单使用</title>
@@ -130,7 +686,7 @@ handler.then(function (val) {
 
 &lt;p&gt;ok，到目前为止，你可以大声的说，你会用promise啦～不过这个只是简单的介绍，让大家初步了解而已。&lt;/p&gt;
 
-&lt;p&gt;下一篇，介绍Promise的高级使用。&lt;/p&gt;
+&lt;p&gt;下一篇，&lt;a href=&quot;/js/2016/01/25/promise-stydy-2/&quot;&gt;介绍Promise的详细使用&lt;/a&gt;。&lt;/p&gt;
 
 </content>
  </entry>
@@ -619,7 +1175,7 @@ var require = {
        }
     }
 
-});
+};
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;这样就ok啦，现在可以想怎么折腾就怎么折腾了。&lt;/p&gt;

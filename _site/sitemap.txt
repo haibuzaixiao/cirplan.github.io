@@ -8,6 +8,8 @@ jeffdeng.me/sitemap.txt
 jeffdeng.me/tags.html
 jeffdeng.me/zabout.html
 
+jeffdeng.me/js/2016/01/26/promise-study-3
+jeffdeng.me/js/2016/01/25/promise-stydy-2
 jeffdeng.me/js/2016/01/22/promise-study-1
 jeffdeng.me/web/2015/12/03/dom-ready
 jeffdeng.me/web/2015/11/30/html5-audio

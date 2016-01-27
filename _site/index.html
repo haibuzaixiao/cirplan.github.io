@@ -135,10 +135,10 @@
 <div class="row post">
   <div class="span11">
     <h1 class="title">
-      <a href="/js/2016/01/22/promise-study-1" title="Promise初级教程1：简单使用">Promise初级教程1：简单使用</a> 
+      <a href="/js/2016/01/26/promise-study-3" title="Promise初级教程3：解析流程">Promise初级教程3：解析流程</a> 
       
     </h1>
-    <div class="date f-c-b"><span class="font-spcial">2016-01-22</span></div>
+    <div class="date f-c-b"><span class="font-spcial">2016-01-26</span></div>
     
     <div class="tag-n">
      <ul class="tag_box inline">
@@ -148,11 +148,11 @@
 
   
      
-    	<li><a href="/tags.html#web-ref">web <span>5</span></a></li>
+    	<li><a href="/tags.html#web-ref">web <span>7</span></a></li>
      
-    	<li><a href="/tags.html#js-ref">js <span>8</span></a></li>
+    	<li><a href="/tags.html#js-ref">js <span>10</span></a></li>
      
-    	<li><a href="/tags.html#promise-ref">promise <span>1</span></a></li>
+    	<li><a href="/tags.html#Promise-ref">Promise <span>2</span></a></li>
     
   
 
@@ -162,119 +162,196 @@
      
       </div>
       
-<p>就快过年了，项目组是准备在回去之前，发完2.4版本。然后现在已经进入测试后期了。</p>
+<p>接上篇，下面的序号是为了与<a href="https://promisesaplus.com/">规范</a>中一致。</p>
 
-<p>趁着现在有点时间，把之前一直想写的promise写一下。</p>
+<h2 id="promise-">2.3. Promise 解析流程</h2>
 
-<pre><code>刚说完就来一个Bug，先去改bug。
-</code></pre>
+<p>这里主要是根据规范来看，要注意哈，搬运工又来了。</p>
 
-<p>过了N个半小时后，又回来了。让我们直接进入主题。</p>
+<p>Promise 解析过程 是以一个 promise 和一个值 x 做为参数的抽象过程，可表示为 <code>[[Resolve]](promise, x)</code>, 过程如下：</p>
 
-<h2 id="promise-">Promise 是什么</h2>
+<h5 id="promise--x---typeerror--promise-">2.3.1 如果 promise 和 x 指向相同的值, 使用 TypeError 做为原因将 promise 拒绝，如下：</h5>
 
-<p><strong>承诺</strong>。就像有人问：你是男的吗？你可以做出俩种回答：是或者不是。</p>
-
-<p>回答是，那就是肯定的承诺。</p>
-
-<p>回答不是，那就是拒绝的承诺。</p>
-
-<p>只能有俩种吗?是的，Promise里面只能有两种承诺，肯定或否定。</p>
-
-<p>那我什么时候需要这样的承诺？感觉用不上啊？<strong>在异步调用的时候</strong>。</p>
-
-<h2 id="promise">Promise怎么用？</h2>
-
-<p>一般学习一个新东西，最直接的问题是怎么用。不然有可能造成看了一堆理论，还是云里雾里。引用一句话就是：道理我都懂，然后呢？</p>
-
-<h3 id="promise-1">新建Promise对象</h3>
-
-<p>Promise作为构造函数，新建如下：</p>
-
-<pre><code>var handler = new Promise(function (resolve, reject) {
-    ... // 逻辑代码
+<pre><code>var promise = Promise.resolve('done').then(function () {
+    return promise;
 });
-</code></pre>
 
-<p>嗯，新建Promise对象很简单嘛，就传入一个函数作为参数，然后逻辑代码在函数里面。这个函数再带着 resolve 和 reject 俩个函数作为参数。
-什么？resolve &amp; reject是函数？没错，他们是函数。那他们有什么作用？</p>
-
-<p>resolve 表示肯定承诺。</p>
-
-<p>reject 表示否定承诺。</p>
-
-<h3 id="then">then?</h3>
-
-<p>定义了Promise对象，然后呢？然后就要处理肯定或者否定的承诺啊。</p>
-
-<pre><code>var handler = new Promise(function (resolve, reject) {
-    ... // 逻辑代码
-}); 
-
-handler.then(function (val) {
-    ... // 肯定承诺的回调
-}, function (e) {
-    ... // 否定承诺的回调
+promise.then(null, function (reason) {
+    console.log('error', reason);
 });
+// error TypeError: Chaining cycle detected for promise #&lt;Promise&gt;
 </code></pre>
 
-<p>这里可以看到，<code>then(resolve, reject)</code>方法接收两个参数，分别是肯定承诺的回调和否定承诺的回调。</p>
+<h5 id="x--promise--">2.3.2 如果 x 是一个 promise , 采用其状态:</h5>
 
-<p>到这里，基本的Promise使用就介绍结束了。什么？还是不懂？我们看看例子。</p>
+<ul>
+  <li>2.3.2.1 如果 x 是 pending 状态，promise 必须保持 pending 走到 x fulfilled 或 rejected。</li>
+  <li>2.3.2.2 如果 x 是 fulfilled 状态，将 x 的值用于 fulfill promise。</li>
+  <li>2.3.2.3 如果 x 是 rejected 状态, 将 x 的原因用于 reject promise。</li>
+</ul>
 
-<h3 id="section">例子</h3>
+<p>如下：</p>
 
-<p>我们来看看这个例子，新建了Promise对象，500ms后进行了肯定的承诺。因为新版Chrome和Firefox是自带Promise，所以我们可以直接在控制台里测试。</p>
+<pre><code>var dummy = { dummy: "dummy" };
 
-<p>肯定承诺例子：</p>
+// 2.3.2.1，x 是 pending 状态
+function xFactory() {
+    return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+            resolve(1000);
+        }, 1000);
+    });
+}
 
-<pre><code>// ex1
-var startTime = Date.now();
-console.log('start', startTime);
-
-var handler = new Promise(function (resolve, reject) {
-    setTimeout(function () {
-    	resolve('done', Date.now() - startTime);
-    }, 500);
-}); 
-
-handler.then(function (val) {
-    console.log('then resolve', val, Date.now() - startTime);
-}, function (e) {
-    console.log('then reject', e, Date.now() - startTime);
+var promise = Promise.resolve(dummy).then(function () {
+    return xFactory();
 });
-</code></pre>
 
-<p><img src="/images/2016/20160122promise/ex1.png" alt="ex1" /></p>
+promise.then(
+    function (val) {
+        console.log('resolve', val);
+    },
+    function (e) {
+        console.log('reject', e);
+    }
+);
+// resolve 1000
 
-<p>嗯，在这个例子了，我们可以明显感受到 resolve 函数的用法。那么 reject 呢？其实是差不多的。</p>
-
-<p>否定承诺例子：</p>
-
-<pre><code>// ex2
-var startTime = Date.now();
-console.log('start', startTime);
-
-var handler = new Promise(function (resolve, reject) {
-    setTimeout(function () {
-        reject('done', Date.now() - startTime);
-    }, 500);
-}); 
-
-handler.then(function (val) {
-    console.log('then resolve', val, Date.now() - startTime);
-}, function (e) {
-    console.log('then reject', e, Date.now() - startTime);
+// 2.3.2.2，x 是 fulfilled 状态
+var promise = Promise.resolve(dummy).then(function () {
+    return Promise.resolve('done');
 });
+
+promise.then(
+    function (val) {
+        console.log('resolve', val);
+    },
+    function (e) {
+        console.log('reject', e);
+    }
+);
+// resolve done
+
+// 2.3.2.3，x 是 rejected 状态
+var promise = Promise.resolve(dummy).then(function () {
+    return Promise.reject('error');
+});
+
+promise.then(
+    function (val) {
+        console.log('resolve', val);
+    },
+    function (e) {
+        console.log('reject', e);
+    }
+);
+// reject error
 </code></pre>
 
-<p><img src="/images/2016/20160122promise/ex2.png" alt="ex2" /></p>
+<h5 id="x-">2.3.3 如果 x 是一个对象或一个函数:</h5>
 
-<p>在上面这个例子，给出了拒绝的承诺，然后就会执行 then 方法的 reject 回调函数。是不是很简单。</p>
+<p>2.3.3.1 将 then 赋为 x.then</p>
 
-<p>ok，到目前为止，你可以大声的说，你会用promise啦～不过这个只是简单的介绍，让大家初步了解而已。</p>
+<pre><code>// 1. 当 x 为没有原型的对象时
+var numberOfTimesThenWasRetrieved = 0;
 
-<p>下一篇，介绍Promise的高级使用。</p>
+function xFactory() {
+    return Object.create(null, {
+        then: {
+            get: function () {
+                ++numberOfTimesThenWasRetrieved;
+                return function thenMethodForX(onFulfilled) {
+                    onFulfilled();
+                };
+            }
+        }
+    });
+}
+
+var promise = Promise.resolve(dummy).then(function onBasePromiseFulfilled() {
+    return xFactory();
+});
+
+console.log(promise);
+// Promise {[[PromiseStatus]]: "pending", [[PromiseValue]]: undefined}
+
+promise.then(function () {
+    console.log(numberOfTimesThenWasRetrieved);
+});
+// 1
+
+// 2. 当 x 为有基本原型的对象，修改如下
+function xFactory() {
+    return Object.create(Object.prototype, {
+        then: {
+            get: function () {
+                ++numberOfTimesThenWasRetrieved;
+                return function thenMethodForX(onFulfilled) {
+                    onFulfilled();
+                };
+            }
+        }
+    });
+}
+// 1
+
+// 3. 当 x 为函数时
+function xFactory() {
+    function x() { }
+
+    Object.defineProperty(x, "then", {
+        get: function () {
+            ++numberOfTimesThenWasRetrieved;
+            return function thenMethodForX(onFulfilled) {
+                onFulfilled();
+            };
+        }
+    });
+
+    return x;
+}
+// 1
+</code></pre>
+
+<p>2.3.3.2 如果在取 x.then 值时抛出了异常，则以这个异常做为原因将 promise 拒绝</p>
+
+<pre><code>// 取 x.then 的时候，出现错误
+function xFactory() {
+    return Object.create(Object.prototype, {
+        then: {
+            get: function () {
+                throw Error('error');
+            }
+        }
+    });
+}
+</code></pre>
+
+<p><img src="/images/2016/20160122promise/promise_catch_1.png" alt="promise_catch_1" /></p>
+
+<p>2.3.3.3 如果 then 是一个函数， 以 x 为 this 调用 then 函数，且第一个参数是 resolvePromise，第二个参数是 rejectPromise，且：</p>
+
+<ul>
+  <li>2.3.3.3.1 当 resolvePromise 被以 y 为参数调用, 执行 <code>[[Resolve]](promise, y)</code>。</li>
+  <li>2.3.3.3.2 当 rejectPromise 被以 r 为参数调用, 则以 r 为原因将 promise 拒绝。</li>
+  <li>2.3.3.3.3 如果 resolvePromise 和 rejectPromise 都被调用了，或者被调用了多次，则只第一次有效，后面的忽略。</li>
+  <li>2.3.3.3.4 如果在调用 then 时抛出了异常，则。
+    <ul>
+      <li>2.3.3.3.4.1 如果 resolvePromise 或 rejectPromise 已经被调用了，则忽略它。</li>
+      <li>2.3.3.3.4.2 否则, 以 e 为 reason 将 promise 拒绝。</li>
+    </ul>
+  </li>
+</ul>
+
+<p>这个有点绕，看测试代码也挺复杂。这里就不贴代码了（测试代码900多行），有兴趣直接看 <a href="https://github.com/promises-aplus/promises-tests/blob/master/lib/tests/2.3.3.js">这里</a>。</p>
+
+<p>所以，回到之前的问题：</p>
+
+<p><img src="/images/2016/20160122promise/promise_resolve_4.png" alt="resolve_4" /></p>
+
+<p>这个看 2.3.3.4，因为请求错误的接口，在调用 then 时抛出了异常，所以会进入到 Rejected 状态。</p>
+
+<p>哎，感觉这个流程还是有点问题，再琢磨琢磨。</p>
 
 
       <ul class="pager">
