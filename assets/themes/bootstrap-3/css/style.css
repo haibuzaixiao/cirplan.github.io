@@ -130,6 +130,7 @@ h4, h5, h6 {
 }
 
 code {
+  margin: 0 2px;
   font-size: 85%;
   border-radius: 3px;
 }
