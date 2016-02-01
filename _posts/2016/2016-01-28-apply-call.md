@@ -1,6 +1,6 @@
 ---
 layout: post
-category : js
+category: js
 title: JS中apply、call和bind的定义和使用
 tags : [js, apply, call]
 ---

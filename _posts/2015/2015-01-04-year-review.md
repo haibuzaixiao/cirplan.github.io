@@ -1,6 +1,6 @@
 ---
 layout: post
-category : 生活
+category: 生活
 title: 2014年回顾
 tags : [2014, plan, 生活]
 ---
