@@ -4,7 +4,7 @@ category : js
 title: Undescore.js和jQuery的类型判断
 tags : [web, js]
 ---
-{% include JB/setup %}
+
 
 记得很久之前，有简单的记录过 js 中的数据类型（[点这里][1]）。那么，如何去判断一个变量的数据类型呢？
 
