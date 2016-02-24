@@ -296,7 +296,7 @@ js 在判断类型的道路上，曾经有很多的尝试，每个类库的判�
 
 * [Sea.js 源码解析（三）][4]
 
-[1]: /js/2013/03/02/js-data-type/
+[1]: /js/2013/03/02/js-data-type
 [2]: http://stackoverflow.com/questions/103598/why-was-the-arguments-callee-caller-property-deprecated-in-javascript/235760#235760
 [3]: https://github.com/jashkenas/underscore/issues/1621
 [4]: https://github.com/lifesinger/blog/issues/175
