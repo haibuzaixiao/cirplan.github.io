@@ -4,13 +4,331 @@
  <title>萝拔</title>
  <link href="jeffdeng.me/" rel="self"/>
  <link href="jeffdeng.me"/>
- <updated>2016-02-01T15:27:23+08:00</updated>
+ <updated>2016-02-24T16:59:47+08:00</updated>
  <id>jeffdeng.me</id>
  <author>
    <name>dcirplan</name>
    <email>dcirplan@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Undescore.js和jQuery的类型判断</title>
+   <link href="jeffdeng.me/js/2016/02/19/js-data-type2"/>
+   <updated>2016-02-19T00:00:00+08:00</updated>
+   <id>jeffdeng.me/js/2016/02/19/js-data-type2</id>
+   <content type="html">
+&lt;p&gt;记得很久之前，有简单的记录过 js 中的数据类型（&lt;a href=&quot;/js/2013/03/02/js-data-type/&quot;&gt;点这里&lt;/a&gt;）。那么，如何去判断一个变量的数据类型呢？&lt;/p&gt;
+
+&lt;p&gt;先来看看一些判断 bug ：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;typeof null // &quot;object&quot;
+typeof new String(&#39;abc&#39;) // &quot;object&quot;
+
+var iframeArr = new window.frames[0].Array;
+iframeArr instanceof Array // false
+
+isNaN(&#39;abc&#39;) // true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以说，在判断类型的时候，往往不小心就产生了 bug . 那么，怎样才能准确判断数据类型？来看看 &lt;code&gt;undescore.js&lt;/code&gt; 和 &lt;code&gt;jQuery&lt;/code&gt; 的做法。&lt;/p&gt;
+
+&lt;h2 id=&quot;underscore-183&quot;&gt;1. underscore 1.8.3&lt;/h2&gt;
+
+&lt;p&gt;underscore 提供了一堆判断类型的函数，如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;- isArray
+- isObject
+- isArguments
+- isFunction
+- isString
+- isNumber
+- isFinite
+- isBoolean
+- isDate
+- isRegExp
+- isNaN
+- isNull
+- isUndefined
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其核心的判断代码如下，利用 &lt;code&gt;Object.prototype.toSting&lt;/code&gt;，这个也是业界公认好用的方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
+_.each([&#39;Arguments&#39;, &#39;Function&#39;, &#39;String&#39;, &#39;Number&#39;, &#39;Date&#39;, &#39;RegExp&#39;, &#39;Error&#39;], function(name) {
+    _[&#39;is&#39; + name] = function(obj) {
+        return toString.call(obj) === &#39;[object &#39; + name + &#39;]&#39;;
+    };
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;下面看看其他判断函数。&lt;/p&gt;
+
+&lt;h3 id=&quot;isarray&quot;&gt;- isArray&lt;/h3&gt;
+
+&lt;p&gt;先判断浏览器是否支持原生ES5的 &lt;code&gt;Array.isArray&lt;/code&gt; 方法，支持则直接用原生方法判断，不然利用 &lt;code&gt;Object.prototype.toSting&lt;/code&gt; 来判断。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var ObjProto = Object.prototype,
+    toString = ObjProto.toString,
+    nativeIsArray = Array.isArray;
+
+_.isArray = nativeIsArray || function(obj) {
+    return toString.call(obj) === &#39;[object Array]&#39;;
+  };
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;isobject&quot;&gt;- isObject&lt;/h3&gt;
+
+&lt;p&gt;直接用 typeof 判断。不过判断函数的时候，也是 &lt;code&gt;true&lt;/code&gt; ? 这样岂不是会和 &lt;code&gt;isFunction&lt;/code&gt; 有重叠？&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;_.isObject = function(obj) {
+    var type = typeof obj;
+    return type === &#39;function&#39; || type === &#39;object&#39; &amp;amp;&amp;amp; !!obj;
+};
+
+// example
+function a () {}
+console.log(_.isObject(a)); // true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;isarguments-ie9-&quot;&gt;- isArguments &lt;code&gt;低于IE9 版本&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;直接判断是否有 &lt;code&gt;callee&lt;/code&gt; 属性。要注意的是：在 ES5 标准中，严格模式下，函数参数是没有 &lt;code&gt;callee&lt;/code&gt; 属性的，详细看&lt;a href=&quot;http://stackoverflow.com/questions/103598/why-was-the-arguments-callee-caller-property-deprecated-in-javascript/235760#235760&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;_.has = function(obj, key) {
+    return obj != null &amp;amp;&amp;amp; hasOwnProperty.call(obj, key);
+};
+
+// 在 IE &amp;lt; 9 是没有 [object Arguments] 这个类型的
+if (!_.isArguments(arguments)) {
+    _.isArguments = function(obj) {
+        return _.has(obj, &#39;callee&#39;);
+    };
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;isfunction-&quot;&gt;- isFunction &lt;code&gt;优化版本&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;这里会有疑问，明明直接用 typeof 判断就可以了，为什么还要加后面的 &lt;code&gt;|| false&lt;/code&gt;？注释里说是因为 IE11 (&amp;amp; IE8) 下面的 bug。详情看&lt;a href=&quot;https://github.com/jashkenas/underscore/issues/1621&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
+// IE 11 (#1621), and in Safari 8 (#1929).
+if (typeof /./ != &#39;function&#39; &amp;amp;&amp;amp; typeof Int8Array != &#39;object&#39;) {
+    _.isFunction = function(obj) {
+        return typeof obj == &#39;function&#39; || false;
+    };
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;isfinite&quot;&gt;- isFinite&lt;/h3&gt;
+
+&lt;p&gt;判断一个数是否为有限，先看基本的测试：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;isFinite(Infinity);  // false
+isFinite(NaN);       // false
+isFinite(-Infinity); // false
+
+isFinite(0);         // true
+isFinite(2e64);      // true
+isFinite(null);      // true
+
+isFinite(&quot;0&quot;);       // true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再看 underscore.js 中的代码，排除了 NaN 情况：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;_.isFinite = function(obj) {
+    return isFinite(obj) &amp;amp;&amp;amp; !isNaN(parseFloat(obj));
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;isnan---isboolean---isnull---isundefined&quot;&gt;- isNaN, - isBoolean, - isNull, - isUndefined&lt;/h3&gt;
+
+&lt;p&gt;其他类型判断函数没什么特别的，如下。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// Is the given value `NaN`? (NaN is the only number which does not equal itself).
+_.isNaN = function(obj) {
+    return _.isNumber(obj) &amp;amp;&amp;amp; obj !== +obj;
+};
+
+// Is a given value a boolean?
+_.isBoolean = function(obj) {
+    return obj === true || obj === false || toString.call(obj) === &#39;[object Boolean]&#39;;
+};
+
+// Is a given value equal to null?
+_.isNull = function(obj) {
+    return obj === null;
+};
+
+// Is a given variable undefined?
+_.isUndefined = function(obj) {
+    return obj === void 0;
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;jquery-1112&quot;&gt;2. jQuery 1.11.2&lt;/h2&gt;
+
+&lt;p&gt;看看 jQuery 中封装的类型判断接口：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$.type(obj)
+$.isArray(obj)
+$.isFunction(obj)
+$.isEmptyObject(obj)
+$.isPlainObject(obj)
+$.isWindow(obj)
+$.isNumeric(value)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其核心代码如下，也是采用 &lt;code&gt;Object.prototype.toSting&lt;/code&gt; ：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var class2type = {};
+
+var toString = class2type.toString;
+
+...
+
+jQuery.each(&quot;Boolean Number String Function Array Date RegExp Object Error&quot;.split(&quot; &quot;), function(i, name) {
+    class2type[ &quot;[object &quot; + name + &quot;]&quot; ] = name.toLowerCase();
+});
+
+...
+
+type: function( obj ) {
+    if ( obj == null ) {
+        return obj + &quot;&quot;;
+    }
+    return typeof obj === &quot;object&quot; || typeof obj === &quot;function&quot; ?
+        class2type[ toString.call(obj) ] || &quot;object&quot; :
+        typeof obj;
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中 &lt;code&gt;isArray&lt;/code&gt; 和 &lt;code&gt;isFunction&lt;/code&gt; 是对 &lt;code&gt;type&lt;/code&gt; 函数的进一步封装。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;isFunction: function( obj ) {
+    return jQuery.type(obj) === &quot;function&quot;;
+},
+
+isArray: Array.isArray || function( obj ) {
+    return jQuery.type(obj) === &quot;array&quot;;
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;下面继续看看其他函数。&lt;/p&gt;
+
+&lt;h3 id=&quot;isemptyobject&quot;&gt;- isEmptyObject&lt;/h3&gt;
+
+&lt;p&gt;判断是否为空对象。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;isEmptyObject: function( obj ) {
+    var name;
+    for ( name in obj ) {
+        return false;
+    }
+    return true;
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;isplainobject&quot;&gt;- isPlainObject&lt;/h3&gt;
+
+&lt;p&gt;这是 jQuery 中特有的方法，判断一个对象是否为纯粹对象（通过 {} 或 new Object() 创建的）。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var hasOwn = class2type.hasOwnProperty;
+
+...
+
+isPlainObject: function( obj ) {
+    var key;
+
+    // 不能被转为true, 
+    // 类型一定要是[object Object]
+    // 过滤 Dom 节点和 window 对象
+    if ( !obj || jQuery.type(obj) !== &quot;object&quot; || obj.nodeType || jQuery.isWindow( obj ) ) {
+        return false;
+    }
+
+    try {
+        // 没有自己的 constructor 属性的一定为 Object
+        if ( obj.constructor &amp;amp;&amp;amp;
+            !hasOwn.call(obj, &quot;constructor&quot;) &amp;amp;&amp;amp;
+            !hasOwn.call(obj.constructor.prototype, &quot;isPrototypeOf&quot;) ) {
+            return false;
+        }
+    } catch ( e ) {
+        // IE8,9执行上面操作的时候，会报错，也返回 false
+        return false;
+    }
+
+    // Support: IE&amp;lt;9
+    // Handle iteration over inherited properties before own properties.
+    if ( support.ownLast ) {
+        for ( key in obj ) {
+            return hasOwn.call( obj, key );
+        }
+    }
+
+    // 在枚举属性的时候，自身的属性会先被枚举，然后再枚举继承的属性，如果枚举的最后一个属性为自身的，则为 true
+    for ( key in obj ) {}
+
+    return key === undefined || hasOwn.call( obj, key );
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;iswindow&quot;&gt;- isWindow&lt;/h3&gt;
+
+&lt;p&gt;判断是否为 window 对象。利用 window = window.window 的属性。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;isWindow: function( obj ) {
+    return obj != null &amp;amp;&amp;amp; obj == obj.window;
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;isnumeric&quot;&gt;- isNumeric&lt;/h3&gt;
+
+&lt;p&gt;判断是否为数字。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;isNumeric: function( obj ) {
+    // parseFloat NaNs numeric-cast false positives (null|true|false|&quot;&quot;)
+    // ...but misinterprets leading-number strings, particularly hex literals (&quot;0x...&quot;)
+    // subtraction forces infinities to NaN
+    // adding 1 corrects loss of precision from parseFloat (#15100)
+    return !jQuery.isArray( obj ) &amp;amp;&amp;amp; (obj - parseFloat( obj ) + 1) &amp;gt;= 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;js 在判断类型的道路上，曾经有很多的尝试，每个类库的判断方式都不同，但自从 &lt;code&gt;Object.prototype.toSting&lt;/code&gt; 被挖掘出来后，
+已经变成了公认的判断类型方法。&lt;/p&gt;
+
+&lt;p&gt;把 jQuery 中的 &lt;code&gt;type&lt;/code&gt; 方法抽出来如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var typeObj = {} ;
+&quot;Boolean Number String Function Array Date RegExp Object Error&quot;.split(&quot; &quot;).forEach( function (e, i) {
+    typeObj[ &quot;[object &quot; + e + &quot;]&quot; ] = e.toLowerCase();
+});
+
+function _typeof (obj) {
+    if ( obj == null ) {
+        return String( obj );
+    }
+    return typeof obj === &quot;object&quot; || typeof obj === &quot;function&quot; ?
+        typeObj[ typeObj.toString.call(obj) ] || &quot;object&quot; :
+        typeof obj;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样，在判断类型的时候，就可以直接用这段代码了（在没有判断函数的时候）。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;延伸阅读&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/lifesinger/blog/issues/175&quot;&gt;Sea.js 源码解析（三）&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+</content>
+ </entry>
  
  <entry>
    <title>我的2015</title>

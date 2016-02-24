@@ -135,10 +135,10 @@
 <div class="row post">
   <div class="span11">
     <h1 class="title">
-      <a href="/%E7%94%9F%E6%B4%BB/2016/02/01/year-review" title="我的2015">我的2015</a> 
+      <a href="/js/2016/02/19/js-data-type2" title="Undescore.js和jQuery的类型判断">Undescore.js和jQuery的类型判断</a> 
       
     </h1>
-    <div class="date f-c-b"><span class="font-spcial">2016-02-01</span></div>
+    <div class="date f-c-b"><span class="font-spcial">2016-02-19</span></div>
     
     <div class="tag-n">
      <ul class="tag_box inline">
@@ -148,9 +148,9 @@
 
   
      
-    	<li><a href="/tags.html#2015-ref">2015 <span>1</span></a></li>
+    	<li><a href="/tags.html#web-ref">web <span>8</span></a></li>
      
-    	<li><a href="/tags.html#生活-ref">生活 <span>6</span></a></li>
+    	<li><a href="/tags.html#js-ref">js <span>12</span></a></li>
     
   
 
@@ -160,65 +160,314 @@
      
       </div>
       
-<p>其实一直不想写2015年的总结，因为过的实在不咋样。而且年初定的计划，很多都没去做。所以就在想，写这个到底是为了什么？
-吹一堆牛皮，然后就没有然后了？因为想不通，所以不想写。</p>
+<p>记得很久之前，有简单的记录过 js 中的数据类型（<a href="/js/2013/03/02/js-data-type/">点这里</a>）。那么，如何去判断一个变量的数据类型呢？</p>
 
-<p>后来想了想，趁着现在有时间，还是随便扯下吧，就当自言自语。</p>
+<p>先来看看一些判断 bug ：</p>
 
-<h2 id="section">最重要的事</h2>
+<pre><code>typeof null // "object"
+typeof new String('abc') // "object"
 
-<p>2015年最重要的事，应该是毕业吧。嗯，终于毕业了。不用再去上那些不知道为什么要上的课，或者说没什么意义的课。</p>
+var iframeArr = new window.frames[0].Array;
+iframeArr instanceof Array // false
 
-<p>对于我的专业，其实是不太喜欢的。但这个专业90%是自己填的（找不到当时填了什么专业，真蛋疼）。填志愿的时候，一直想去计软，然后就找相关的专业。
-然后当时的参考书，都是只有专业名字，没有专业学院的。结果，填了数院的专业，全校分数线最低的几个之一。</p>
+isNaN('abc') // true
+</code></pre>
 
-<p>到了大学，一开始想转专业的，但后来还是没有转。一方面是怕麻烦，另一方面是以前学的东西忘的差不多了，一直没有复习。结果就这样呆下来了。
-嗯，人生有时候真的不能将就。如果一开始方向是错的，再前进多远都是没有意义的（其实我这个没这么严重，打个比喻）。这个导致我对大学的课程都不怎么感兴趣，
-上课抄作业，下课玩游戏（其实专业有一定原因，更多是个人吧）。然后，大学四年，挂了五到六科必修吧，虽然后面渐渐把学分修回来了，但这个过程比较痛苦。其实大学的考试还是很容易过的，只要用一点点心。不过我每次都是期末前两周或一周，才开始看书，有时候科目多就顾及不过来了。记得最疯狂的是，用半天的时候开始看一科，看完直接去考试，结果还低空飘过。</p>
+<p>所以说，在判断类型的时候，往往不小心就产生了 bug . 那么，怎样才能准确判断数据类型？来看看 <code>undescore.js</code> 和 <code>jQuery</code> 的做法。</p>
 
-<p>所以，可以顺利毕业，对于我来说是一件多重要的事。</p>
+<h2 id="underscore-183">1. underscore 1.8.3</h2>
 
-<h2 id="section-1">最好玩的事情</h2>
+<p>underscore 提供了一堆判断类型的函数，如下：</p>
 
-<p>最好玩的事情，应该是和我们组的小伙伴一起去了桂林玩吧。一方面是，活了20几岁，还没出过广东省，丢人；另一方面是，就我们7个人去玩，自由。</p>
+<pre><code>- isArray
+- isObject
+- isArguments
+- isFunction
+- isString
+- isNumber
+- isFinite
+- isBoolean
+- isDate
+- isRegExp
+- isNaN
+- isNull
+- isUndefined
+</code></pre>
 
-<p>在桂林那边呆了三天，去了挺多地方的，还拍了N多照（不过拍的我比较丑，咳咳）。虽然小伙伴们都不是很活跃，但还是很开心的，难得。下次再这样一起出去旅游的机会，应该很少了吧。</p>
+<p>其核心的判断代码如下，利用 <code>Object.prototype.toSting</code>，这个也是业界公认好用的方法：</p>
 
-<p>不过还是希望，下次出去玩的时候，小伙伴们能放开点。毕竟是出来玩的，如果还像上班一样拘谨，那就没什么效果了。</p>
+<pre><code>// Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
+_.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function(name) {
+    _['is' + name] = function(obj) {
+        return toString.call(obj) === '[object ' + name + ']';
+    };
+});
+</code></pre>
 
-<h2 id="section-2">最刺激的事</h2>
+<p>下面看看其他判断函数。</p>
 
-<p>最刺激的事，应该是去穿越东西冲吧。好像是周三，突然很想出去走走，然后觉得穿越东西冲很好玩。好吧，其实我想象中，应该是阳光，沙滩，美…咳咳。就是想的比较简单，随便走走就可以到了。</p>
+<h3 id="isarray">- isArray</h3>
 
-<p>然后叫上了师兄和他同事，等到周六三个人就去了。到了才发现，阳光是有了，沙滩个屁，都是石头。然后还要爬上小山丘，再爬下来。整个过程十分酸爽。</p>
+<p>先判断浏览器是否支持原生ES5的 <code>Array.isArray</code> 方法，支持则直接用原生方法判断，不然利用 <code>Object.prototype.toSting</code> 来判断。</p>
 
-<p>因为去之前攻略没有看好，所以穿了短袖衫和短裤去。结果，回来全晒伤了，黑到现在还没完全恢复，真是说多都是泪。因为是沿着海岸线走，有很多陡峭的石头，还是挺危险的。
-最好几个人一起去，互相有个照应。嗯，攻略很重要。不然，又是坑自己。</p>
+<pre><code>var ObjProto = Object.prototype,
+    toString = ObjProto.toString,
+    nativeIsArray = Array.isArray;
 
-<p>整个过程持续了4个小时左右吧，虽然过程很漫长，但到达终点后，还是止不住的兴奋。嗯，这样的户外活动可以多点尝试。</p>
+_.isArray = nativeIsArray || function(obj) {
+    return toString.call(obj) === '[object Array]';
+  };
+</code></pre>
 
-<h2 id="section-3">最难过的事</h2>
+<h3 id="isobject">- isObject</h3>
 
-<p>这个是感情方面的，当时真的很伤心。现在看开了，就还好了。这里不展开。</p>
+<p>直接用 typeof 判断。不过判断函数的时候，也是 <code>true</code> ? 这样岂不是会和 <code>isFunction</code> 有重叠？</p>
 
-<h2 id="section-4">学习</h2>
+<pre><code>_.isObject = function(obj) {
+    var type = typeof obj;
+    return type === 'function' || type === 'object' &amp;&amp; !!obj;
+};
 
-<p>有一定的进步，但进步不大。毕设用 nodejs + mysql 搭了个项目，属于实验室产品，你懂的。</p>
+// example
+function a () {}
+console.log(_.isObject(a)); // true
+</code></pre>
 
-<p>然后在公司这边，负责移动端**项目的整个前端，从切页到对接口。从搭框架，到选什么技术，都是自己决定。嗯，自由度比较高。这个怎么说呢，有好的，也有不好的。
-好的是，什么都是自己来，想怎么弄就怎么弄，比较自由，也可以用一些比较新的技术。但也是因为只有我一个人，很多事情没有想的比较全面。导致项目有点混乱，属于半实验室半生成产品（这样说不会给打吧）。然后注册用户有十几万吧，月活有5千到1万左右（我没有确切数据）？等过完年来，是肯定要重构一遍的了。</p>
+<h3 id="isarguments-ie9-">- isArguments <code>低于IE9 版本</code></h3>
 
-<p>这一年，书看的不是很多（小说倒看了几本）。和年初想的看完买的那些技术书差远了。努力吧，你看或不看，书就在那里。</p>
+<p>直接判断是否有 <code>callee</code> 属性。要注意的是：在 ES5 标准中，严格模式下，函数参数是没有 <code>callee</code> 属性的，详细看<a href="http://stackoverflow.com/questions/103598/why-was-the-arguments-callee-caller-property-deprecated-in-javascript/235760#235760">这里</a>。</p>
 
-<h2 id="section-5">生活</h2>
+<pre><code>_.has = function(obj, key) {
+    return obj != null &amp;&amp; hasOwnProperty.call(obj, key);
+};
 
-<p>生活就那样，依然是单身狗。但相比以前，更喜欢爬山和跑步，还有徒步（都是简单的运动）。</p>
+// 在 IE &lt; 9 是没有 [object Arguments] 这个类型的
+if (!_.isArguments(arguments)) {
+    _.isArguments = function(obj) {
+        return _.has(obj, 'callee');
+    };
+}
+</code></pre>
 
-<h2 id="section-6">关于2016</h2>
+<h3 id="isfunction-">- isFunction <code>优化版本</code></h3>
 
-<p>不敢再列出一堆要干嘛干嘛的事情了，因为，实践结果很明显。</p>
+<p>这里会有疑问，明明直接用 typeof 判断就可以了，为什么还要加后面的 <code>|| false</code>？注释里说是因为 IE11 (&amp; IE8) 下面的 bug。详情看<a href="https://github.com/jashkenas/underscore/issues/1621">这里</a>。</p>
 
-<p>努力吧。</p>
+<pre><code>// Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
+// IE 11 (#1621), and in Safari 8 (#1929).
+if (typeof /./ != 'function' &amp;&amp; typeof Int8Array != 'object') {
+    _.isFunction = function(obj) {
+        return typeof obj == 'function' || false;
+    };
+}
+</code></pre>
+
+<h3 id="isfinite">- isFinite</h3>
+
+<p>判断一个数是否为有限，先看基本的测试：</p>
+
+<pre><code>isFinite(Infinity);  // false
+isFinite(NaN);       // false
+isFinite(-Infinity); // false
+
+isFinite(0);         // true
+isFinite(2e64);      // true
+isFinite(null);      // true
+
+isFinite("0");       // true
+</code></pre>
+
+<p>再看 underscore.js 中的代码，排除了 NaN 情况：</p>
+
+<pre><code>_.isFinite = function(obj) {
+    return isFinite(obj) &amp;&amp; !isNaN(parseFloat(obj));
+};
+</code></pre>
+
+<h3 id="isnan---isboolean---isnull---isundefined">- isNaN, - isBoolean, - isNull, - isUndefined</h3>
+
+<p>其他类型判断函数没什么特别的，如下。</p>
+
+<pre><code>// Is the given value `NaN`? (NaN is the only number which does not equal itself).
+_.isNaN = function(obj) {
+    return _.isNumber(obj) &amp;&amp; obj !== +obj;
+};
+
+// Is a given value a boolean?
+_.isBoolean = function(obj) {
+    return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
+};
+
+// Is a given value equal to null?
+_.isNull = function(obj) {
+    return obj === null;
+};
+
+// Is a given variable undefined?
+_.isUndefined = function(obj) {
+    return obj === void 0;
+};
+</code></pre>
+
+<h2 id="jquery-1112">2. jQuery 1.11.2</h2>
+
+<p>看看 jQuery 中封装的类型判断接口：</p>
+
+<pre><code>$.type(obj)
+$.isArray(obj)
+$.isFunction(obj)
+$.isEmptyObject(obj)
+$.isPlainObject(obj)
+$.isWindow(obj)
+$.isNumeric(value)
+</code></pre>
+
+<p>其核心代码如下，也是采用 <code>Object.prototype.toSting</code> ：</p>
+
+<pre><code>var class2type = {};
+
+var toString = class2type.toString;
+
+...
+
+jQuery.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
+    class2type[ "[object " + name + "]" ] = name.toLowerCase();
+});
+
+...
+
+type: function( obj ) {
+    if ( obj == null ) {
+        return obj + "";
+    }
+    return typeof obj === "object" || typeof obj === "function" ?
+        class2type[ toString.call(obj) ] || "object" :
+        typeof obj;
+},
+</code></pre>
+
+<p>其中 <code>isArray</code> 和 <code>isFunction</code> 是对 <code>type</code> 函数的进一步封装。</p>
+
+<pre><code>isFunction: function( obj ) {
+    return jQuery.type(obj) === "function";
+},
+
+isArray: Array.isArray || function( obj ) {
+    return jQuery.type(obj) === "array";
+},
+</code></pre>
+
+<p>下面继续看看其他函数。</p>
+
+<h3 id="isemptyobject">- isEmptyObject</h3>
+
+<p>判断是否为空对象。</p>
+
+<pre><code>isEmptyObject: function( obj ) {
+    var name;
+    for ( name in obj ) {
+        return false;
+    }
+    return true;
+},
+</code></pre>
+
+<h3 id="isplainobject">- isPlainObject</h3>
+
+<p>这是 jQuery 中特有的方法，判断一个对象是否为纯粹对象（通过 {} 或 new Object() 创建的）。</p>
+
+<pre><code>var hasOwn = class2type.hasOwnProperty;
+
+...
+
+isPlainObject: function( obj ) {
+    var key;
+
+    // 不能被转为true, 
+    // 类型一定要是[object Object]
+    // 过滤 Dom 节点和 window 对象
+    if ( !obj || jQuery.type(obj) !== "object" || obj.nodeType || jQuery.isWindow( obj ) ) {
+        return false;
+    }
+
+    try {
+        // 没有自己的 constructor 属性的一定为 Object
+        if ( obj.constructor &amp;&amp;
+            !hasOwn.call(obj, "constructor") &amp;&amp;
+            !hasOwn.call(obj.constructor.prototype, "isPrototypeOf") ) {
+            return false;
+        }
+    } catch ( e ) {
+        // IE8,9执行上面操作的时候，会报错，也返回 false
+        return false;
+    }
+
+    // Support: IE&lt;9
+    // Handle iteration over inherited properties before own properties.
+    if ( support.ownLast ) {
+        for ( key in obj ) {
+            return hasOwn.call( obj, key );
+        }
+    }
+
+    // 在枚举属性的时候，自身的属性会先被枚举，然后再枚举继承的属性，如果枚举的最后一个属性为自身的，则为 true
+    for ( key in obj ) {}
+
+    return key === undefined || hasOwn.call( obj, key );
+},
+</code></pre>
+
+<h3 id="iswindow">- isWindow</h3>
+
+<p>判断是否为 window 对象。利用 window = window.window 的属性。</p>
+
+<pre><code>isWindow: function( obj ) {
+    return obj != null &amp;&amp; obj == obj.window;
+},
+</code></pre>
+
+<h3 id="isnumeric">- isNumeric</h3>
+
+<p>判断是否为数字。</p>
+
+<pre><code>isNumeric: function( obj ) {
+    // parseFloat NaNs numeric-cast false positives (null|true|false|"")
+    // ...but misinterprets leading-number strings, particularly hex literals ("0x...")
+    // subtraction forces infinities to NaN
+    // adding 1 corrects loss of precision from parseFloat (#15100)
+    return !jQuery.isArray( obj ) &amp;&amp; (obj - parseFloat( obj ) + 1) &gt;= 0;
+}
+</code></pre>
+
+<h2 id="section">总结</h2>
+
+<p>js 在判断类型的道路上，曾经有很多的尝试，每个类库的判断方式都不同，但自从 <code>Object.prototype.toSting</code> 被挖掘出来后，
+已经变成了公认的判断类型方法。</p>
+
+<p>把 jQuery 中的 <code>type</code> 方法抽出来如下：</p>
+
+<pre><code>var typeObj = {} ;
+"Boolean Number String Function Array Date RegExp Object Error".split(" ").forEach( function (e, i) {
+    typeObj[ "[object " + e + "]" ] = e.toLowerCase();
+});
+
+function _typeof (obj) {
+    if ( obj == null ) {
+        return String( obj );
+    }
+    return typeof obj === "object" || typeof obj === "function" ?
+        typeObj[ typeObj.toString.call(obj) ] || "object" :
+        typeof obj;
+}
+</code></pre>
+
+<p>这样，在判断类型的时候，就可以直接用这段代码了（在没有判断函数的时候）。</p>
+
+<h3 id="section-1">延伸阅读</h3>
+
+<ul>
+  <li><a href="https://github.com/lifesinger/blog/issues/175">Sea.js 源码解析（三）</a></li>
+</ul>
 
 
       <ul class="pager">
